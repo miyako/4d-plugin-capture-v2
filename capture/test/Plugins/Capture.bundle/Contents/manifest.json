@@ -1,0 +1,31 @@
+{
+    "name": "capture",
+    "id": 20000,
+    "commands": [
+        {
+            "theme": "capture",
+            "syntax": "capture Request permisson:J",
+            "threadSafe": true
+        },
+        {
+            "theme": "capture",
+            "syntax": "capture Start(&J):J",
+            "threadSafe": true
+        },
+        {
+            "theme": "capture",
+            "syntax": "capture Stop",
+            "threadSafe": true
+        },
+        {
+            "theme": "capture",
+            "syntax": "capture Image:P",
+            "threadSafe": true
+        },
+        {
+            "theme": "capture",
+            "syntax": "capture Update(&J)",
+            "threadSafe": true
+        }
+    ]
+}

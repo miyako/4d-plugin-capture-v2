@@ -3,14 +3,12 @@
 		"version": "1",
 		"kind": "form"
 	},
-	"windowSizingX": "variable",
-	"windowSizingY": "variable",
+	"windowSizingX": "fixed",
+	"windowSizingY": "fixed",
 	"windowMinWidth": 0,
 	"windowMinHeight": 0,
 	"windowMaxWidth": 32767,
 	"windowMaxHeight": 32767,
-	"rightMargin": 0,
-	"bottomMargin": 0,
 	"events": [
 		"onLoad",
 		"onUnload",
@@ -64,9 +62,9 @@
 				"flipV": {
 					"type": "checkbox",
 					"text": "flipV",
-					"top": 199,
-					"left": 592,
-					"width": 146,
+					"top": 220,
+					"left": 512,
+					"width": 66,
 					"height": 22,
 					"events": [
 						"onClick"
@@ -79,9 +77,9 @@
 				"flipH": {
 					"type": "checkbox",
 					"text": "flipH",
-					"top": 239,
-					"left": 592,
-					"width": 146,
+					"top": 260,
+					"left": 512,
+					"width": 66,
 					"height": 22,
 					"events": [
 						"onClick"
@@ -94,9 +92,9 @@
 				"Snap": {
 					"type": "button",
 					"text": "Snap",
-					"top": 77,
-					"left": 618,
-					"width": 120,
+					"top": 20,
+					"left": 585,
+					"width": 160,
 					"height": 22,
 					"events": [
 						"onClick"
@@ -106,22 +104,22 @@
 				},
 				"Frame": {
 					"type": "rectangle",
-					"top": 376,
-					"left": 445,
-					"width": 320,
-					"height": 180,
+					"top": 298,
+					"left": 373,
+					"width": 372,
+					"height": 232,
 					"fill": "transparent",
 					"stroke": "transparent",
-					"sizingX": "fixed",
-					"sizingY": "fixed",
+					"sizingX": "grow",
+					"sizingY": "grow",
 					"strokeWidth": 4
 				},
 				"Stop": {
 					"type": "button",
 					"text": "Stop",
-					"top": 117,
-					"left": 618,
-					"width": 120,
+					"top": 60,
+					"left": 585,
+					"width": 160,
 					"height": 22,
 					"events": [
 						"onClick"
@@ -132,18 +130,73 @@
 				"Start": {
 					"type": "button",
 					"text": "Start",
-					"top": 157,
-					"left": 618,
-					"width": 120,
+					"top": 100,
+					"left": 585,
+					"width": 160,
 					"height": 22,
 					"events": [
 						"onClick"
 					],
 					"method": "ObjectMethods/Start.4dm",
 					"focusable": false
+				},
+				"Start recording": {
+					"type": "button",
+					"text": "Start recording",
+					"top": 140,
+					"left": 585,
+					"width": 160,
+					"height": 22,
+					"events": [
+						"onClick"
+					],
+					"method": "ObjectMethods/Start recording.4dm",
+					"focusable": false
+				},
+				"Stop recording": {
+					"type": "button",
+					"text": "Stop recording",
+					"top": 180,
+					"left": 585,
+					"width": 160,
+					"height": 22,
+					"events": [
+						"onClick"
+					],
+					"method": "ObjectMethods/Stop recording.4dm",
+					"focusable": false
+				},
+				"Pause recording": {
+					"type": "button",
+					"text": "Pause recording",
+					"top": 220,
+					"left": 585,
+					"width": 160,
+					"height": 22,
+					"events": [
+						"onClick"
+					],
+					"method": "ObjectMethods/Pause recording.4dm",
+					"focusable": false
+				},
+				"Resume recording": {
+					"type": "button",
+					"text": "Resume recording",
+					"top": 260,
+					"left": 585,
+					"width": 160,
+					"height": 22,
+					"events": [
+						"onClick"
+					],
+					"method": "ObjectMethods/Resume recording.4dm",
+					"focusable": false
 				}
 			}
 		}
 	],
-	"method": "method.4dm"
+	"method": "method.4dm",
+	"width": 765,
+	"height": 550,
+	"memorizeGeometry": false
 }

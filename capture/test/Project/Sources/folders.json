@@ -11,5 +11,20 @@
 			"generate_file_from_template"
 		]
 	},
+	"sign_app": {
+		"methods": [
+			"xcode_SET_PATH",
+			"xcode_select",
+			"xcode_get_path",
+			"hdiutil",
+			"find_identity",
+			"ditto",
+			"codesign",
+			"install_name_tool",
+			"escape_param",
+			"error_xml",
+			"altool"
+		]
+	},
 	"trash": {}
 }

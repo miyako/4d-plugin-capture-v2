@@ -12,291 +12,435 @@
 
 bool request_permission_granted = false;
 
+#if VERSIONWIN
+ComInitClass g_ComInitClass;
+CaptureMan *captureMan = NULL;
+#endif
+
+#if VERSIONMAC
 typedef struct {
-    
-    NSView *view;
-    CALayer *layer;
-    
+
+	NSView *view;
+	CALayer *layer;
+
 }addSublayerCtx;
 
 void addSublayer(addSublayerCtx *ctx) {
 
-    [ctx->view.layer addSublayer:ctx->layer];/*main thread only*/
-    
+	[ctx->view.layer addSublayer : ctx->layer];/*main thread only*/
+
 }
 
 @implementation CaptureMan
 - (PA_Picture)copyImage
 {
-    return PA_CreatePicture((void *)&buf[0], (PA_long32)buf.size());
+	return PA_CreatePicture((void *)&buf[0], (PA_long32)buf.size());
 }
 
-- (void)startRunning
+-(void)startRunning
 {
-    if(isConfigured) {
-        [previewLayer setHidden:NO];
-        [captureSession startRunning];
-    }
+	if (isConfigured) {
+		[previewLayer setHidden : NO];
+		[captureSession startRunning];
+	}
 }
 
 -(void)stopRunning
 {
-    if(isConfigured) {
-        [captureSession stopRunning];
-    }
+	if (isConfigured) {
+		[captureSession stopRunning];
+	}
 }
 
-- (void)setPreviewLayerView:(NSView *)view frame:(NSRect)frame flipH:(bool)flipH flipV:(bool)flipV
+-(void)setPreviewLayerView:(NSView *)view frame : (NSRect)frame flipH : (bool)flipH flipV : (bool)flipV
 {
-    if(isConfigured) {
-        
-        if(superLayerView) {
-            if(superLayerView != view) {
-                [previewLayer removeFromSuperlayer];
-            }
-        }
-        
-        if(flipH) {
-            
-            if (!flipV) {
-                [previewLayer setAffineTransform:CGAffineTransformMake(-1, 0, 0, 1, frame.size.width, 0)];
-            }else{
-                [previewLayer setAffineTransform:CGAffineTransformMake(-1, 0, 0,-1, 0, 0)];
-            }
-            
-        }else{
-            if (flipV) {
-                [previewLayer setAffineTransform:CGAffineTransformMake( 1, 0, 0,-1, 0,frame.size.height)];
-            }else{
-                [previewLayer setAffineTransform:CGAffineTransformMake( 1, 0, 0, 1, 0, 0)];
-            }
-            
-        }
+	if (isConfigured) {
 
-        if(superLayerView != view) {
-            superLayerView = view;
-            addSublayerCtx ctx;
-            ctx.layer = previewLayer;
-            ctx.view = view;
-            PA_RunInMainProcess((PA_RunInMainProcessProcPtr)addSublayer, &ctx);
-        }
+		if (superLayerView) {
+			if (superLayerView != view) {
+				[previewLayer removeFromSuperlayer];
+			}
+		}
 
-        [previewLayer setFrame:frame];
-    }
-}
+		if (flipH) {
 
-- (void)updatePreviewLayerFrame:(NSRect)frame flipH:(bool)flipH flipV:(bool)flipV hidden:(bool)hidden
-{
-    if(isConfigured) {
-        
-        if(flipH) {
-            
-            if (!flipV) {
-                [previewLayer setAffineTransform:CGAffineTransformMake(-1, 0, 0, 1, frame.size.width, 0)];
-            }else{
-                [previewLayer setAffineTransform:CGAffineTransformMake(-1, 0, 0,-1, 0, 0)];
-            }
-            
-        }else{
-            if (flipV) {
-                [previewLayer setAffineTransform:CGAffineTransformMake( 1, 0, 0,-1, 0,frame.size.height)];
-            }else{
-                [previewLayer setAffineTransform:CGAffineTransformMake( 1, 0, 0, 1, 0, 0)];
-            }
-            
-        }
-        
-        [previewLayer setHidden:hidden];
-        [previewLayer setFrame:frame];
-    }
-    
+			if (!flipV) {
+				[previewLayer setAffineTransform : CGAffineTransformMake(-1, 0, 0, 1, frame.size.width, 0)];
+			}
+			else {
+				[previewLayer setAffineTransform : CGAffineTransformMake(-1, 0, 0, -1, 0, 0)];
+			}
+
+		}
+		else {
+			if (flipV) {
+				[previewLayer setAffineTransform : CGAffineTransformMake(1, 0, 0, -1, 0, frame.size.height)];
+			}
+			else {
+				[previewLayer setAffineTransform : CGAffineTransformMake(1, 0, 0, 1, 0, 0)];
+			}
+
+		}
+
+		if (superLayerView != view) {
+			superLayerView = view;
+			addSublayerCtx ctx;
+			ctx.layer = previewLayer;
+			ctx.view = view;
+			PA_RunInMainProcess((PA_RunInMainProcessProcPtr)addSublayer, &ctx);
+		}
+
+		[previewLayer setFrame : frame];
+	}
 }
 
-- (id)init
+-(void)updatePreviewLayerFrame:(NSRect)frame flipH : (bool)flipH flipV : (bool)flipV hidden : (bool)hidden
 {
-    if(!(self = [super init])) return self;
-    
-    NSError *error = nil;
-    
-    captureSession = [[AVCaptureSession alloc]init];
-    
-    [captureSession beginConfiguration];
-    
-    videoDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-    videoInput = [AVCaptureDeviceInput deviceInputWithDevice:videoDevice error:&error];
-    
-    if (videoInput) {
-        if ([captureSession canAddInput:videoInput]) {
-            [captureSession addInput:videoInput];
-            videoOutput = [[AVCaptureVideoDataOutput alloc]init];
-            if (videoOutput) {
-                if ([captureSession canAddOutput:videoOutput]) {
-                    [captureSession addOutput:videoOutput];
-                    
-                    imageOutput = [[AVCaptureStillImageOutput alloc]init];
-                    if (imageOutput) {
-                        
-                        if([captureSession canAddOutput:imageOutput])
-                        {
-                            [captureSession addOutput:imageOutput];
-                            previewLayer = [[AVCaptureVideoPreviewLayer alloc]init];
-                            
-                            /* no combination to emulate 4D resizing (y is pinned to the bottom, not top) */
-//                            previewLayer.autoresizingMask = kCALayerWidthSizable|kCALayerHeightSizable;
-                            [previewLayer setSession:captureSession];
-                            
-                            superLayerView = nil;
-                            
-                            imageCaptured = false;
-                            isConfigured = true;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    [captureSession commitConfiguration];
-    
-    notificationCenter = [[NSWorkspace sharedWorkspace]notificationCenter];
-    
-    if (@available(macOS 10.14, *)) {
-        [notificationCenter
-         addObserver:self
-         selector: @selector(onInterrupted:)
-         name:AVCaptureSessionWasInterruptedNotification
-         object:nil];
-        
-        [notificationCenter
-         addObserver:self
-         selector: @selector(onSessionInterruptionEnded:)
-         name:AVCaptureSessionInterruptionEndedNotification
-         object:nil];
-    }
-    
-    [notificationCenter
-     addObserver:self
-     selector: @selector(onSessionRuntimeError:)
-     name:AVCaptureSessionRuntimeErrorNotification
-     object:nil];
-    
-    [notificationCenter
-     addObserver:self
-     selector: @selector(onStartRunning:)
-     name:AVCaptureSessionDidStartRunningNotification
-     object:nil];
-    
-    [notificationCenter
-     addObserver:self
-     selector: @selector(onStopRunning:)
-     name:AVCaptureSessionDidStopRunningNotification
-     object:nil];
-    
-    [notificationCenter
-     addObserver:self
-     selector: @selector(onDeviceConnected:)
-     name:AVCaptureDeviceWasConnectedNotification
-     object:nil];
- 
-    [notificationCenter
-     addObserver:self
-     selector: @selector(onDeviceDisconnected:)
-     name:AVCaptureDeviceWasDisconnectedNotification
-     object:nil];
-    
-    return self;
+	if (isConfigured) {
+
+		if (flipH) {
+
+			if (!flipV) {
+				[previewLayer setAffineTransform : CGAffineTransformMake(-1, 0, 0, 1, frame.size.width, 0)];
+			}
+			else {
+				[previewLayer setAffineTransform : CGAffineTransformMake(-1, 0, 0, -1, 0, 0)];
+			}
+
+		}
+		else {
+			if (flipV) {
+				[previewLayer setAffineTransform : CGAffineTransformMake(1, 0, 0, -1, 0, frame.size.height)];
+			}
+			else {
+				[previewLayer setAffineTransform : CGAffineTransformMake(1, 0, 0, 1, 0, 0)];
+			}
+
+		}
+
+		[previewLayer setHidden : hidden];
+		[previewLayer setFrame : frame];
+	}
+
 }
 
-- (void)onDeviceDisconnected:(NSNotification *)notification
+-(void)startRecording:(NSURL *)url
 {
-    
-}
-- (void)onDeviceConnected:(NSNotification *)notification
-{
-    
-}
-- (void)onStopRunning:(NSNotification *)notification
-{
-    
-}
-- (void)onStartRunning:(NSNotification *)notification
-{
-    
-}
-- (void)onSessionRuntimeError:(NSNotification *)notification
-{
-    
-}
-- (void)onSessionInterruptionEnded:(NSNotification *)notification
-{
-    
-}
-- (void)onInterrupted:(NSNotification *)notification
-{
-    
+	if (isConfigured) {
+		if (isConfigured) {
+			if (![fileOutput isRecording]) {
+				[fileOutput startRecordingToOutputFileURL : url recordingDelegate : self];
+
+			}
+		}
+	}
 }
 
-- (bool)isImageReady
+-(void)stopRecording
 {
-    return imageCaptured;
-}
-- (void)captureImage
-{
-    if(isConfigured) {
-        
-        if([captureSession isRunning]) {
+	if (isConfigured) {
+		[fileOutput stopRecording];
+	}
 
-            imageCaptured = false;
-            AVCaptureConnection *connection = [imageOutput connectionWithMediaType:AVMediaTypeVideo];
-            
-            [imageOutput captureStillImageAsynchronouslyFromConnection:connection
-                                                     completionHandler:^( CMSampleBufferRef imageDataSampleBuffer, NSError *error)
-             {
-                 
-                 if(!error)
-                 {
-                     NSData *data = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
-                     if(data) {
-                         buf.resize([data length]);
-                         [data getBytes:&buf[0] length:[data length]];
-                     }
-                 }
-                 
-                 imageCaptured = true;
-             }];
-        }
-    }
 }
-- (void)dealloc
+
+-(void)pauseRecording
 {
-    if(isConfigured) {
-        [previewLayer release];
-        [videoOutput release];
-        [imageOutput release];
-    }
-    
-    [[[NSWorkspace sharedWorkspace] notificationCenter]removeObserver:self];
-    
-    [captureSession release];
-    
-    [super dealloc];
+	if (isConfigured) {
+		[fileOutput pauseRecording];
+	}
+}
+
+-(void)resumeRecording
+{
+	if (isConfigured) {
+		[fileOutput resumeRecording];
+	}
+}
+
+-(bool)isDeviceUniqueID:(const char *)uniqueID
+{
+	bool returnValue = false;
+
+	if (uniqueID) {
+
+		returnValue = [[NSString stringWithUTF8String : uniqueID]isEqualToString:deviceUniqueID];
+	}
+
+	return returnValue;
+}
+
+-(id)initWithUniqueID:(const char *)uniqueID
+{
+	if (!(self = [super init])) return self;
+
+	NSError *error = nil;
+
+	captureSession = [[AVCaptureSession alloc]init];
+
+	[captureSession beginConfiguration];
+
+	if (!uniqueID) {
+
+		videoDevice = [AVCaptureDevice defaultDeviceWithMediaType : AVMediaTypeVideo];
+		deviceUniqueID = [videoDevice uniqueID];
+
+	}
+	else {
+		deviceUniqueID = [NSString stringWithUTF8String : uniqueID];
+		videoDevice = [AVCaptureDevice deviceWithUniqueID : deviceUniqueID];
+	}
+
+	videoInput = [AVCaptureDeviceInput deviceInputWithDevice : videoDevice error : &error];
+
+	if (videoInput) {
+		if ([captureSession canAddInput : videoInput]) {
+			[captureSession addInput : videoInput];
+			videoOutput = [[AVCaptureVideoDataOutput alloc]init];
+			if (videoOutput) {
+				if ([captureSession canAddOutput : videoOutput]) {
+					[captureSession addOutput : videoOutput];
+
+					imageOutput = [[AVCaptureStillImageOutput alloc]init];
+					if (imageOutput) {
+
+						if ([captureSession canAddOutput : imageOutput])
+						{
+							[captureSession addOutput : imageOutput];
+
+							fileOutput = [[AVCaptureMovieFileOutput alloc]init];
+							if (fileOutput) {
+								if ([captureSession canAddOutput : fileOutput])
+									[captureSession addOutput : fileOutput];
+
+								previewLayer = [[AVCaptureVideoPreviewLayer alloc]init];
+
+								/* no combination to emulate 4D resizing (y is pinned to the bottom, not top) */
+								//                            previewLayer.autoresizingMask = kCALayerWidthSizable|kCALayerHeightSizable;
+								[previewLayer setSession : captureSession];
+
+								superLayerView = nil;
+
+								imageCaptured = false;
+								isConfigured = true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	[captureSession commitConfiguration];
+
+	notificationCenter = [NSNotificationCenter defaultCenter];
+
+	if (@available(macOS 10.14, *)) {
+	[notificationCenter
+		addObserver : self
+		selector : @selector(onInterrupted : )
+				   name:AVCaptureSessionWasInterruptedNotification
+		object : nil];
+
+	[notificationCenter
+		addObserver : self
+		selector : @selector(onSessionInterruptionEnded : )
+				   name:AVCaptureSessionInterruptionEndedNotification
+		object : nil];
+	}
+
+	[notificationCenter
+		addObserver : self
+		selector : @selector(onSessionRuntimeError : )
+				   name:AVCaptureSessionRuntimeErrorNotification
+		object : nil];
+
+	[notificationCenter
+		addObserver : self
+		selector : @selector(onStartRunning : )
+				   name:AVCaptureSessionDidStartRunningNotification
+		object : nil];
+
+	[notificationCenter
+		addObserver : self
+		selector : @selector(onStopRunning : )
+				   name:AVCaptureSessionDidStopRunningNotification
+		object : nil];
+
+	[notificationCenter
+		addObserver : self
+		selector : @selector(onDeviceConnected : )
+				   name:AVCaptureDeviceWasConnectedNotification
+		object : nil];
+
+	[notificationCenter
+		addObserver : self
+		selector : @selector(onDeviceDisconnected : )
+				   name:AVCaptureDeviceWasDisconnectedNotification
+		object : nil];
+
+	return self;
+}
+
+-(void)onDeviceDisconnected:(NSNotification *)notification
+{
+
+}
+
+-(void)onDeviceConnected : (NSNotification *)notification
+{
+
+}
+
+-(void)onStopRunning : (NSNotification *)notification
+{
+	if ([fileOutput isRecording])[fileOutput stopRecording];
+}
+
+-(void)onStartRunning : (NSNotification *)notification
+{
+
+}
+
+-(void)onSessionRuntimeError : (NSNotification *)notification
+{
+	if ([fileOutput isRecording])[fileOutput stopRecording];
+}
+
+-(void)onSessionInterruptionEnded : (NSNotification *)notification
+{
+
+}
+
+-(void)onInterrupted : (NSNotification *)notification
+{
+
+}
+
+-(void)captureOutput : (AVCaptureFileOutput *)output
+didStartRecordingToOutputFileAtURL : (NSURL *)fileURL
+	fromConnections : (NSArray<AVCaptureConnection *> *)connections
+{
+
+}
+
+-(void)captureOutput : (AVCaptureFileOutput *)output
+willFinishRecordingToOutputFileAtURL : (NSURL *)fileURL
+	fromConnections : (NSArray<AVCaptureConnection *> *)connections
+	error : (NSError *)error
+{
+
+}
+
+-(void)captureOutput : (AVCaptureFileOutput *)output
+didFinishRecordingToOutputFileAtURL : (NSURL *)outputFileURL
+	fromConnections : (NSArray<AVCaptureConnection *> *)connections
+	error : (NSError *)error
+{
+
+}
+
+-(void)captureOutput : (AVCaptureFileOutput *)output
+didPauseRecordingToOutputFileAtURL : (NSURL *)fileURL
+	fromConnections : (NSArray<AVCaptureConnection *> *)connections
+{
+
+}
+
+-(void)captureOutput : (AVCaptureFileOutput *)output
+didResumeRecordingToOutputFileAtURL : (NSURL *)fileURL
+	fromConnections : (NSArray<AVCaptureConnection *> *)connections
+{
+
+}
+
+-(bool)isImageReady
+{
+	return imageCaptured;
+}
+
+-(void)prepareForCaptureImage
+{
+	imageCaptured = false;
+}
+
+-(void)captureImage
+{
+	if (isConfigured) {
+
+		if ([captureSession isRunning]) {
+
+			AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
+
+			[imageOutput captureStillImageAsynchronouslyFromConnection : connection
+				completionHandler : ^ (CMSampleBufferRef imageDataSampleBuffer, NSError *error)
+			{
+
+				if (!error)
+				{
+					NSData *data = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation : imageDataSampleBuffer];
+					if (data) {
+						buf.resize([data length]);
+						[data getBytes : &buf[0] length : [data length]];
+					}
+				}
+
+				imageCaptured = true;
+			}];
+		}
+		else {
+			imageCaptured = true;
+		}
+	}
+	else {
+		imageCaptured = true;
+	}
+}
+
+-(void)dealloc
+{
+	[notificationCenter removeObserver : self];
+
+	if (isConfigured) {
+
+		if ([fileOutput isRecording])[fileOutput stopRecording];
+
+		[previewLayer release];
+		[videoOutput release];
+		[imageOutput release];
+		[fileOutput release];
+	}
+
+	[captureSession release];
+
+	[super dealloc];
 }
 @end
 
 CaptureMan *captureMan = nil;
 
+#endif
+
 void OnStartup()
 {
-    
+
 }
 
 void OnExit()
 {
+#if VERSIONMAC
     if(captureMan)
     {
         [captureMan release];
         captureMan = nil;
     }
+#else
+	if (captureMan)
+	{
+		delete captureMan;
+		captureMan = NULL;
+	}
+#endif
 }
 
 #pragma mark -
@@ -312,7 +456,7 @@ void PluginMain(PA_long32 selector, PA_PluginParameters params) {
                 OnStartup();
                 break;
                 
-            case kCloseProcess :case kDeinitPlugin:
+            case kDeinitPlugin:
             case kServerDeinitPlugin:
                 OnExit();
                 break;
@@ -338,6 +482,26 @@ void PluginMain(PA_long32 selector, PA_PluginParameters params) {
             case 5 :
                 capture_Update(params);
                 break;
+                
+            case 6 :
+                capture_Start_recording(params);
+                break;
+                
+            case 7 :
+                capture_Stop_recording(params);
+                break;
+                
+            case 8 :
+                capture_Pause_recording(params);
+                break;
+                
+            case 9 :
+                capture_Resume_recording(params);
+                break;
+                
+            case 10 :
+                capture_Devices(params);
+                break;
   
         }
 
@@ -350,6 +514,7 @@ void PluginMain(PA_long32 selector, PA_PluginParameters params) {
 
 #pragma mark -
 
+#if VERSIONMAC
 NSWindow *getWindow(PA_long32 w) {
     
     //EX_GET_HWND has been fixed in 15R3 to return a NSWindow* on mac 64bit.
@@ -366,25 +531,37 @@ NSWindow *getWindow(PA_long32 w) {
     
     return 0;
 }
+#endif
 
 void capture_Image(PA_PluginParameters params) {
-    
-    if(request_permission_granted) {
-        if(captureMan)
-        {
-            [captureMan performSelectorInBackground:@selector(captureImage) withObject:nil];
-            
-            do {
-                PA_YieldAbsolute();
-            } while (![captureMan isImageReady]);
-            
-            PA_Picture p = [captureMan copyImage];
-            PA_ReturnPicture(params, p);
-        }
-    }
+#if VERSIONMAC
+	if (request_permission_granted) {
+		if (captureMan)
+		{
+			[captureMan prepareForCaptureImage];
+			[captureMan performSelectorInBackground : @selector(captureImage) withObject:nil];
+
+			do {
+				PA_YieldAbsolute();
+			} while (![captureMan isImageReady]);
+
+			PA_Picture p = [captureMan copyImage];
+			PA_ReturnPicture(params, p);
+		}
+	}
+#else
+	if (captureMan) {
+		PA_Picture p = captureMan->copyImage();
+		PA_ReturnPicture(params, p);
+	}
+
+	
+#endif
 }
 
 void capture_Stop(PA_PluginParameters params) {
+ 
+#if VERSIONMAC
     
     if(request_permission_granted) {
         if(captureMan)
@@ -392,10 +569,16 @@ void capture_Stop(PA_PluginParameters params) {
             [captureMan performSelectorInBackground:@selector(stopRunning) withObject:nil];
         }
     }
+#else
+	if (captureMan) {
+		captureMan->stopRunning();
+	}
+#endif
 }
 
 void capture_Update(PA_PluginParameters params) {
-    
+
+#if VERSIONMAC
     if(request_permission_granted) {
         
         if(captureMan)
@@ -423,9 +606,88 @@ void capture_Update(PA_PluginParameters params) {
             }
         }
     }
+    
+#else
+    PA_ObjectRef param = PA_GetObjectParameter(params, 1);
+    
+    if(param) {
+        
+		PA_long32 w = (PA_long32)ob_get_n(param, L"window");
+        PA_long32 x = (PA_long32)ob_get_n(param, L"x");
+        PA_long32 y = (PA_long32)ob_get_n(param, L"y");
+        PA_long32 width = (PA_long32)ob_get_n(param, L"width");
+        PA_long32 height = (PA_long32)ob_get_n(param, L"height");
+
+        bool hidden = ob_get_b(param, L"hidden");
+       
+		if (captureMan) {
+			captureMan->update(w, x, y, width, height, hidden);
+		}
+
+    }
+    
+#endif
+}
+
+void capture_Start_recording(PA_PluginParameters params) {
+    
+#if VERSIONMAC
+    if(request_permission_granted) {
+        
+        PA_ObjectRef param = PA_GetObjectParameter(params, 1);
+        
+        if(param) {
+            
+            CUTF8String path;
+            ob_get_s(param, L"file", &path);
+            NSString *str = [[NSString alloc]initWithUTF8String:(const char *)path.c_str()];
+            
+            if(str) {
+                NSURL *url = (NSURL *)CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (CFStringRef)str, kCFURLHFSPathStyle, false);
+                [captureMan performSelectorInBackground:@selector(startRecording:) withObject:url];
+                [url release];
+                [str release];
+            }
+        }
+    }
+    
+#endif
+}
+
+void capture_Pause_recording(PA_PluginParameters params) {
+    
+#if VERSIONMAC
+    if(request_permission_granted) {
+        [captureMan performSelectorInBackground:@selector(pauseRecording) withObject:nil];
+    }
+    
+#endif
+}
+
+void capture_Resume_recording(PA_PluginParameters params) {
+    
+#if VERSIONMAC
+    if(request_permission_granted) {
+        [captureMan performSelectorInBackground:@selector(resumeRecording) withObject:nil];
+    }
+    
+#endif
+}
+
+void capture_Stop_recording(PA_PluginParameters params) {
+
+#if VERSIONMAC
+    
+    if(request_permission_granted) {
+        [captureMan performSelectorInBackground:@selector(stopRecording) withObject:nil];
+    }
+    
+#endif
 }
 
 void capture_Start(PA_PluginParameters params) {
+    
+#if VERSIONMAC
     
     if(request_permission_granted) {
         
@@ -444,13 +706,29 @@ void capture_Start(PA_PluginParameters params) {
             bool flipV = ob_get_b(param, L"flipV");
             bool flipH = ob_get_b(param, L"flipH");
             
+            const char *uniqueID = NULL;
+            CUTF8String _uniqueID;
+            
+            if(ob_get_s(param, L"device", &_uniqueID)) {
+                uniqueID = (const char *)_uniqueID.c_str();
+            }
+            
             if(window) {
                 
                 NSView *contentView = [window contentView];
                 
                 if(!captureMan)
                 {
-                    captureMan = [[CaptureMan alloc]init];
+                    
+                    captureMan = [[CaptureMan alloc]initWithUniqueID:uniqueID];
+                    
+                }else if(uniqueID) {
+                    
+                    if(![captureMan isDeviceUniqueID:uniqueID]) {
+                        [captureMan release];
+                        captureMan = [[CaptureMan alloc]initWithUniqueID:uniqueID];
+                    }
+                    
                 }
                 
                 NSRect rect;
@@ -460,56 +738,92 @@ void capture_Start(PA_PluginParameters params) {
                 rect.size.height = height;
                 
                 [captureMan setPreviewLayerView:contentView frame:rect flipH:flipH flipV:flipV];
+                
                 [captureMan performSelectorInBackground:@selector(startRunning) withObject:nil];
             }
         }
     }
-}
 
-typedef enum {
-
-    request_permission_unknown = 0,
-    request_permission_authorized = 1,
-    request_permission_not_determined = 2,
-    request_permission_denied = 3,
-    request_permission_restricted = 4
+#else
+    PA_ObjectRef param = PA_GetObjectParameter(params, 1);
     
-}request_permission_t;
+    if(param) {
+        
+        PA_long32 w = (PA_long32)ob_get_n(param, L"window");
 
-request_permission_t requestPermission (AVMediaType mediaType) {
-    
-    if (@available(macOS 10.14, *)) {
+		PA_long32 x = (PA_long32)ob_get_n(param, L"x");
+		PA_long32 y = (PA_long32)ob_get_n(param, L"y");
+		PA_long32 width = (PA_long32)ob_get_n(param, L"width");
+		PA_long32 height = (PA_long32)ob_get_n(param, L"height");
 
-        switch ([AVCaptureDevice authorizationStatusForMediaType:mediaType])
-        {
-            case AVAuthorizationStatusAuthorized:
-                request_permission_granted = true;
-                return request_permission_authorized;
-                break;
-
-            case AVAuthorizationStatusNotDetermined:
-                [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
-                    if (granted) {
-                        request_permission_granted = true;
-                    }
-                }];
-                return request_permission_not_determined;
-                break;
-
-            case AVAuthorizationStatusDenied:
-                request_permission_granted = false;
-                return request_permission_denied;
-                break;
-                
-            case AVAuthorizationStatusRestricted:
-                request_permission_granted = false;
-                return request_permission_restricted;
-                break;
+        const wchar_t *uniqueID = NULL;
+        CUTF16String _uniqueID;
+        
+        if(ob_get_a(param, L"device", &_uniqueID)) {
+            uniqueID = (const wchar_t *)_uniqueID.c_str();
         }
+
+		if (!captureMan)
+		{
+			captureMan = new CaptureMan();
+			captureMan->setup(uniqueID, w, x, y, width, height);
+		}
+		else
+		{
+			if (captureMan->getWindowRef() != w) {
+				delete captureMan;
+				captureMan = new CaptureMan();
+				captureMan->setup(uniqueID, w, x, y, width, height);
+			}
+			else {
+				captureMan->update(w, x, y, width, height, false);
+			}
+
+		}
+
+		captureMan->startRunning();
     }
-    
-    return request_permission_unknown;
+
+#endif
 }
+
+#if VERSIONMAC
+request_permission_t requestPermission(AVMediaType mediaType) {
+
+	if (@available(macOS 10.14, *)) {
+
+	switch ([AVCaptureDevice authorizationStatusForMediaType : mediaType])
+	{
+	case AVAuthorizationStatusAuthorized:
+		request_permission_granted = true;
+		return request_permission_authorized;
+		break;
+
+	case AVAuthorizationStatusNotDetermined:
+		[AVCaptureDevice requestAccessForMediaType : AVMediaTypeVideo completionHandler : ^ (BOOL granted) {
+			if (granted) {
+				request_permission_granted = true;
+			}
+		}];
+		return request_permission_not_determined;
+		break;
+
+	case AVAuthorizationStatusDenied:
+		request_permission_granted = false;
+		return request_permission_denied;
+		break;
+
+	case AVAuthorizationStatusRestricted:
+		request_permission_granted = false;
+		return request_permission_restricted;
+		break;
+	}
+	}
+
+	return request_permission_unknown;
+}
+
+#endif
 
 /*
  https://stackoverflow.com/questions/18970093/can-an-ios-app-read-its-own-entitlements-at-runtime
@@ -519,6 +833,7 @@ void capture_Request_permisson(PA_PluginParameters params) {
     
     PA_ObjectRef status = PA_CreateObject();
     
+#if VERSIONMAC
     NSBundle *mainBundle = [NSBundle mainBundle];
     if(mainBundle) {
       NSDictionary *infoDictionary = [mainBundle infoDictionary];
@@ -591,7 +906,537 @@ void capture_Request_permisson(PA_PluginParameters params) {
         ob_set_b(status, L"success", false);
         ob_set_s(status, L"errorMessage", "failed to locate [NSBundle mainBundle]");
     }
+#endif
     
     PA_ReturnObject(params, status);
 }
 
+void capture_Devices(PA_PluginParameters params) {
+    
+    PA_CollectionRef devices = PA_CreateCollection();
+    
+#if VERSIONMAC
+    NSArray<AVCaptureDevice *> *_devices = [AVCaptureDevice devices];
+    
+    [_devices enumerateObjectsUsingBlock:^(AVCaptureDevice *
+                                           _device, NSUInteger idx, BOOL *stop){
+        
+        if([_device hasMediaType:AVMediaTypeVideo]) {
+            
+            NSString *uniqueID = [_device uniqueID];
+            NSString *modelID = [_device modelID];
+            NSString *manufacturer = [_device manufacturer];
+            NSString *localizedName = [_device localizedName];
+            BOOL connected = [_device isConnected];
+            
+            PA_ObjectRef o = PA_CreateObject();
+            
+            ob_set_s(o, L"uniqueID", (const char *)[uniqueID UTF8String]);
+            ob_set_s(o, L"modelID", (const char *)[modelID UTF8String]);
+            ob_set_s(o, L"manufacturer", (const char *)[manufacturer UTF8String]);
+            ob_set_s(o, L"localizedName", (const char *)[localizedName UTF8String]);
+            ob_set_b(o, L"connected", connected);
+            
+            PA_Variable v = PA_CreateVariable(eVK_Object);
+            PA_SetObjectVariable(&v, o);
+            
+            PA_SetCollectionElement(devices, PA_GetCollectionLength(devices), v);
+            
+        }
+        
+    }];
+#else
+    if(g_ComInitClass.isComReady()) {
+        
+        ICreateDevEnum *pDevEnum = NULL;
+        HRESULT hr = CoCreateInstance(CLSID_SystemDeviceEnum,
+                                      NULL,
+                                      CLSCTX_INPROC_SERVER,
+                                      IID_PPV_ARGS(&pDevEnum));
+        
+        if (SUCCEEDED(hr))
+        {
+            IEnumMoniker *pEnum = NULL;
+            hr = pDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, &pEnum, 0);
+            
+            if (hr != S_FALSE)
+            {
+                IMoniker *pMoniker = NULL;
+                while (pEnum->Next(1, &pMoniker, NULL) == S_OK)
+                {
+                    IPropertyBag *pPropBag = NULL;
+                    hr = pMoniker->BindToStorage(0, 0, IID_PPV_ARGS(&pPropBag));
+                    
+                    if (FAILED(hr))
+                    {
+                        pMoniker->Release();
+                        continue;
+                    }
+                    
+                    VARIANT var;
+                    
+                    PA_ObjectRef o = PA_CreateObject();
+                    
+                    VariantInit(&var);
+                    hr = pPropBag->Read(L"FriendlyName", &var, 0);
+                    if (SUCCEEDED(hr))
+                    {
+                        ob_set_a(o, L"friendlyName", (const wchar_t *)var.bstrVal);
+                        VariantClear(&var);
+                    }
+
+                    VariantInit(&var);
+                    hr = pPropBag->Read(L"Description", &var, 0);
+                    if (SUCCEEDED(hr))
+                    {
+                        ob_set_a(o, L"description", (const wchar_t *)var.bstrVal);
+                        VariantClear(&var);
+                    }
+                    
+                    VariantInit(&var);
+                    hr = pPropBag->Read(L"DevicePath", &var, 0);
+                    if (SUCCEEDED(hr))
+                    {
+                        ob_set_a(o, L"devicePath", (const wchar_t *)var.bstrVal);
+                        VariantClear(&var);
+                    }
+                    
+                    PA_Variable v = PA_CreateVariable(eVK_Object);
+                    PA_SetObjectVariable(&v, o);
+                    PA_SetCollectionElement(devices, PA_GetCollectionLength(devices), v);
+                    
+                    pPropBag->Release();
+                    pMoniker->Release();
+                }
+                
+            }
+            pDevEnum->Release();
+        }
+    }
+    
+#endif
+    
+    PA_ReturnCollection(params, devices);
+}
+
+#if VERSIONWIN
+
+PA_long32 CaptureMan::getWindowRef() {
+
+	if (isConfigured) {
+
+		return windowRef;
+
+	}
+
+	return 0;
+}
+
+/*
+bool CaptureMan::isWindowInvalid() {
+
+HWND _windowRef = (HWND)PA_GetHWND(reinterpret_cast<PA_WindowRef>(windowRef));
+
+return (!_windowRef) && IsWindow(_windowRef);
+}
+*/
+
+bool CaptureMan::isDeviceUniqueID(const wchar_t *uniqueID) {
+
+	bool returnValue = false;
+
+	if (uniqueID) {
+		std::wstring u = (const wchar_t *)uniqueID;
+		if (isConfigured) {
+
+			returnValue = (devicePath.compare(u) == 0);
+
+		}
+	
+	}
+
+	return returnValue;
+}
+
+void CaptureMan::startRunning() {
+
+	if (isConfigured) {
+		videoWindow->put_Visible(OATRUE);
+		videoWindow->put_AutoShow(OATRUE);
+		sampleGrabber->SetBufferSamples(TRUE);
+		mediaControl->Run();
+	}
+
+}
+
+void CaptureMan::stopRunning() {
+
+	if (isConfigured) {
+		sampleGrabber->SetBufferSamples(FALSE);
+		videoWindow->put_Visible(OAFALSE);
+		videoWindow->put_AutoShow(OAFALSE);
+		mediaControl->Stop();
+	}
+
+}
+
+CaptureMan::CaptureMan() {
+
+	isConfigured = false;
+
+	captureGraphBuilder = NULL;
+	videoWindow = NULL;
+	mediaControl = NULL;
+	sampleGrabber = NULL;
+	grabberFilter = NULL;
+	graphBuilder = NULL;
+	deviceFilter = NULL;
+
+}
+
+CaptureMan::~CaptureMan() {
+
+	if (captureGraphBuilder) captureGraphBuilder->Release();
+	if (videoWindow) {
+		videoWindow->put_Visible(OAFALSE);
+		videoWindow->put_AutoShow(OAFALSE);
+		videoWindow->SetWindowPosition(0, 0, 0, 0);
+		videoWindow->put_Owner(NULL);
+		videoWindow->Release();
+	}
+	if (mediaControl) {
+		mediaControl->Stop();
+		mediaControl->Release();
+	}
+	if (sampleGrabber) {
+		sampleGrabber->SetBufferSamples(FALSE);
+		sampleGrabber->Release();
+	}
+	if (videoControl) {
+		videoControl->Release();
+	}
+	if (grabberFilter) grabberFilter->Release();
+	if (graphBuilder) graphBuilder->Release();
+	if (deviceFilter) deviceFilter->Release();
+
+	captureGraphBuilder = NULL;
+	videoWindow = NULL;
+	mediaControl = NULL;
+	videoControl = NULL;
+	sampleGrabber = NULL;
+	grabberFilter = NULL;
+	graphBuilder = NULL;
+	deviceFilter = NULL;
+
+}
+
+IBaseFilter *capture_getDeviceForName(const wchar_t *n, std::wstring &devicePath) {
+
+	IBaseFilter *pBFilter = NULL;
+
+	std::wstring deviceName;
+
+	if (n) {
+		deviceName = std::wstring(n);
+	}
+
+	ICreateDevEnum *pDevEnum = NULL;
+	HRESULT hr = CoCreateInstance(CLSID_SystemDeviceEnum,
+		NULL,
+		CLSCTX_INPROC_SERVER,
+		IID_PPV_ARGS(&pDevEnum));
+
+	if (SUCCEEDED(hr))
+	{
+		IEnumMoniker *pEnum = NULL;
+		hr = pDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, &pEnum, 0);
+
+		if (hr != S_FALSE)
+		{
+			IMoniker *pMoniker = NULL;
+			while ((pEnum->Next(1, &pMoniker, NULL) == S_OK) && !(pBFilter))
+			{
+				IPropertyBag *pPropBag = NULL;
+				hr = pMoniker->BindToStorage(0, 0, IID_PPV_ARGS(&pPropBag));
+
+				if (FAILED(hr))
+				{
+					pMoniker->Release();
+					continue;
+				}
+
+				VARIANT var;
+				VariantInit(&var);
+
+				if (deviceName.length() == 0) {
+					hr = pPropBag->Read(L"DevicePath", &var, 0);
+					if (SUCCEEDED(hr))
+					{
+						std::wstring _DevicePath = (const wchar_t *)var.bstrVal;
+						VariantClear(&var);
+						devicePath = _DevicePath;
+
+						hr = pMoniker->BindToObject(0, 0, IID_IBaseFilter, (void **)&pBFilter);
+					}
+
+				}
+				else {
+					hr = pPropBag->Read(L"DevicePath", &var, 0);
+					if (SUCCEEDED(hr))
+					{
+						std::wstring _DevicePath = (const wchar_t *)var.bstrVal;
+						VariantClear(&var);
+
+						if (deviceName.compare(_DevicePath) == 0)
+						{
+							devicePath = deviceName;
+							hr = pMoniker->BindToObject(0, 0, IID_IBaseFilter, (void **)&pBFilter);
+						}
+
+					}
+
+				}
+
+				pPropBag->Release();
+				pMoniker->Release();
+			}
+
+		}
+		pDevEnum->Release();
+	}
+
+	return pBFilter;
+}
+
+PA_Picture CaptureMan::copyImage() {
+
+	IGraphBuilder *pGraph = graphBuilder;
+	IMediaControl *pControl = mediaControl;
+	IBaseFilter *pDeviceFilter = deviceFilter;
+	IBaseFilter *pGrabberFilter = grabberFilter;
+
+	AM_MEDIA_TYPE am_media_type;
+	ZeroMemory(&am_media_type, sizeof(am_media_type));
+
+	sampleGrabber->GetConnectedMediaType(&am_media_type);
+	VIDEOINFOHEADER *pVideoInfoHeader = (VIDEOINFOHEADER *)am_media_type.pbFormat;
+
+	long size = am_media_type.lSampleSize;
+	std::vector<uint8_t> buf(size);
+
+	if (isConfigured) {
+
+		sampleGrabber->GetCurrentBuffer(&size, (long *)&buf[0]);
+
+		BITMAPFILEHEADER bmphdr;
+		memset(&bmphdr, 0, sizeof(bmphdr));
+		bmphdr.bfType = ('M' << 8) | 'B';
+		bmphdr.bfSize = sizeof(bmphdr) + sizeof(BITMAPINFOHEADER) + size;
+		bmphdr.bfOffBits = sizeof(bmphdr) + sizeof(BITMAPINFOHEADER);
+
+		std::vector<uint8_t> bytes(sizeof(bmphdr) + sizeof(BITMAPINFOHEADER) + size);
+		memmove((char *)&bytes[0], &bmphdr, sizeof(bmphdr));
+		memmove((char *)&bytes[sizeof(bmphdr)], &pVideoInfoHeader->bmiHeader, sizeof(BITMAPINFOHEADER));
+		memmove((char *)&bytes[sizeof(bmphdr) + sizeof(BITMAPINFOHEADER)], &buf[0], size);
+
+		return PA_CreatePicture(&bytes[0], bytes.size());
+	}
+
+	return PA_CreatePicture(&buf[0], 0);
+}
+
+void CaptureMan::update(
+	PA_long32 w,
+	PA_long32 x,
+	PA_long32 y,
+	PA_long32 width,
+	PA_long32 height,
+	bool hidden) {
+
+	//captureGraphBuilder->SetOutputFileName
+
+	if (isConfigured) {
+		HWND _windowRef = (HWND)PA_GetHWND(reinterpret_cast<PA_WindowRef>(w));
+
+		if (_windowRef)
+		{
+			if (windowRef != w) {
+				windowRef = w;
+				videoWindow->put_Owner((OAHWND)_windowRef);
+			}
+		}
+
+		videoWindow->SetWindowPosition(x, y, width, height);
+
+		if (hidden) {
+			videoWindow->put_Visible(OAFALSE);
+			videoWindow->put_AutoShow(OAFALSE);
+		}
+		else {
+			videoWindow->put_Visible(OATRUE);
+			videoWindow->put_AutoShow(OATRUE);
+		}
+	}
+}
+
+void CaptureMan::setup(const wchar_t *deviceName,
+	PA_long32 w,
+	PA_long32 x,
+	PA_long32 y,
+	PA_long32 width,
+	PA_long32 height) {
+
+	if (!isConfigured) {
+	
+		IBaseFilter *pDeviceFilter = capture_getDeviceForName(deviceName, devicePath);
+
+		IGraphBuilder *pGraph = NULL;
+		HRESULT hr = CoCreateInstance(CLSID_FilterGraph, NULL,
+			CLSCTX_INPROC_SERVER,
+			IID_IGraphBuilder,
+			(void **)&pGraph);
+		if (SUCCEEDED(hr)) {
+
+			ICaptureGraphBuilder2 *pCapture = NULL;
+			hr = CoCreateInstance(CLSID_CaptureGraphBuilder2,
+				NULL,
+				CLSCTX_INPROC_SERVER,
+				IID_ICaptureGraphBuilder2,
+				(void**)&pCapture);
+
+			if (SUCCEEDED(hr)) {
+
+				IBaseFilter *pGrabberFilter = NULL;
+				hr = CoCreateInstance(CLSID_SampleGrabber,
+					NULL,
+					CLSCTX_INPROC_SERVER,
+					IID_PPV_ARGS(&pGrabberFilter));
+
+				if (SUCCEEDED(hr)) {
+
+					ISampleGrabber *pGrabber = NULL;
+					hr = pGrabberFilter->QueryInterface(IID_ISampleGrabber, (void **)&pGrabber);
+
+					if (SUCCEEDED(hr)) {
+
+						//Set the Media Type
+						AM_MEDIA_TYPE mt;
+						ZeroMemory(&mt, sizeof(mt));
+						mt.majortype = MEDIATYPE_Video;
+						mt.subtype = MEDIASUBTYPE_RGB24;
+						mt.formattype = FORMAT_VideoInfo;
+						hr = pGrabber->SetMediaType(&mt);
+
+						if (SUCCEEDED(hr)) {
+
+							hr = pGraph->AddFilter(pGrabberFilter, L"Sample Grabber");
+
+							if (SUCCEEDED(hr)) {
+
+								hr = pCapture->SetFiltergraph(pGraph);
+
+								if (SUCCEEDED(hr)) {
+
+									IMediaControl *pMControl = NULL;
+									hr = pGraph->QueryInterface(IID_IMediaControl, (void **)&pMControl);
+
+									if (SUCCEEDED(hr)) {
+
+										hr = pGraph->AddFilter(pDeviceFilter, L"Device Filter");
+
+										if (SUCCEEDED(hr)) {
+
+											hr = pCapture->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video,
+												pDeviceFilter, IID_IAMVideoControl, (void**)&videoControl);
+
+											if (SUCCEEDED(hr)) {
+
+												IPin* pin = NULL;
+												long caps = 0;
+
+												hr = pCapture->FindPin(
+													pDeviceFilter, PINDIR_OUTPUT, &PIN_CATEGORY_CAPTURE, NULL, FALSE, 0, &pin);
+												if (SUCCEEDED(hr)) {
+													hr = videoControl->GetCaps(pin, &caps);
+													if (SUCCEEDED(hr))
+													{
+														if ((caps & VideoControlFlag_FlipVertical) > 0)
+															caps = caps & ~(VideoControlFlag_FlipVertical);
+														if ((caps & VideoControlFlag_FlipHorizontal) != 0)
+															caps = caps & ~(VideoControlFlag_FlipHorizontal);
+
+														//videoControl->SetMode(pin, caps);
+													}
+													pin->Release();
+												}
+
+											}
+
+											hr = pCapture->RenderStream(&PIN_CATEGORY_PREVIEW,
+												NULL,
+												pDeviceFilter,
+												pGrabberFilter,
+												NULL);
+
+											if (SUCCEEDED(hr)) {
+												IVideoWindow *pVWindow = NULL;
+												hr = pGraph->QueryInterface(IID_IVideoWindow, (void **)&pVWindow);
+												if (SUCCEEDED(hr)) {
+
+													HWND _windowRef = (HWND)PA_GetHWND(reinterpret_cast<PA_WindowRef>(w));
+
+													if (_windowRef)
+													{
+														windowRef = w;
+														pVWindow->put_Owner((OAHWND)_windowRef);
+
+														pVWindow->put_Visible(OATRUE);
+														pVWindow->put_AutoShow(OATRUE);
+
+														pVWindow->SetWindowPosition(x, y, width, height);
+
+														pVWindow->HideCursor(OAFALSE);
+														pVWindow->put_WindowStyle(WS_CHILD | WS_CLIPCHILDREN);
+
+														deviceFilter = pDeviceFilter;
+														mediaControl = pMControl;
+														videoWindow = pVWindow;
+														graphBuilder = pGraph;
+														grabberFilter = pGrabberFilter;
+														sampleGrabber = pGrabber;
+														captureGraphBuilder = pCapture;
+
+														mediaControl->Pause();
+														sampleGrabber->SetBufferSamples(FALSE);
+
+														isConfigured = true;
+
+													}	
+
+												}//QueryInterface
+
+											}
+
+										}//AddFilter (Device Filter)
+
+									}//pMControl
+
+								}//SetFiltergraph
+
+							}//AddFilter (Sample Grabber)
+
+						}//SetMediaType
+
+					}//pGrabber
+
+				}//pGrabberFilter
+
+			}//pCapture
+
+		}//pGraph
+
+	}
+
+}
+
+#endif

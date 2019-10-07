@@ -26,6 +26,31 @@
             "theme": "capture",
             "syntax": "capture Update(&J)",
             "threadSafe": true
+        },
+        {
+            "theme": "capture",
+            "syntax": "capture Start recording(&J)",
+            "threadSafe": true
+        },
+        {
+            "theme": "capture",
+            "syntax": "capture Stop recording",
+            "threadSafe": true
+        },
+        {
+            "theme": "capture",
+            "syntax": "capture Pause recording",
+            "threadSafe": true
+        },
+        {
+            "theme": "capture",
+            "syntax": "capture Resume recording",
+            "threadSafe": true
+        },
+        {
+            "theme": "capture",
+            "syntax": "capture Devices:C",
+            "threadSafe": true
         }
     ]
 }

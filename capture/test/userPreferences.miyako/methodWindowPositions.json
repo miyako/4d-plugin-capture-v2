@@ -144,10 +144,10 @@
 		"height": 762
 	},
 	"Sources/Methods/TEST.4dm": {
-		"left": 317,
-		"top": 157,
-		"width": 1183,
-		"height": 789
+		"left": -306,
+		"top": 384,
+		"width": 1347,
+		"height": 725
 	},
 	"Sources/Methods/TEST_v17.4dm": {
 		"left": 450,
@@ -162,20 +162,20 @@
 		"height": 789
 	},
 	"Sources/Forms/フォーム1/ObjectMethods/flipH.4dm": {
-		"left": 345,
-		"top": 262,
+		"left": 435,
+		"top": 226,
 		"width": 1183,
 		"height": 789
 	},
 	"Sources/Forms/フォーム1/ObjectMethods/flipV.4dm": {
-		"left": 345,
-		"top": 237,
+		"left": 435,
+		"top": 226,
 		"width": 1183,
-		"height": 814
+		"height": 789
 	},
 	"Sources/Forms/フォーム1/method.4dm": {
-		"left": 345,
-		"top": 262,
+		"left": 435,
+		"top": 226,
 		"width": 1183,
 		"height": 789
 	},
@@ -196,5 +196,107 @@
 		"top": 157,
 		"width": 1183,
 		"height": 789
+	},
+	"Sources/Forms/フォーム1/ObjectMethods/Start recording.4dm": {
+		"left": 435,
+		"top": 201,
+		"width": 1183,
+		"height": 814
+	},
+	"Sources/Forms/フォーム1/ObjectMethods/Stop recording.4dm": {
+		"left": 435,
+		"top": 201,
+		"width": 1183,
+		"height": 814
+	},
+	"Sources/Forms/フォーム1/ObjectMethods/Pause recording.4dm": {
+		"left": 435,
+		"top": 201,
+		"width": 1183,
+		"height": 814
+	},
+	"Sources/Forms/フォーム1/ObjectMethods/Resume recording.4dm": {
+		"left": 435,
+		"top": 201,
+		"width": 1183,
+		"height": 814
+	},
+	"Trash/Methods/(sign_app).4dm": {
+		"left": 180,
+		"top": 215,
+		"width": 1084,
+		"height": 741
+	},
+	"Sources/Methods/altool.4dm": {
+		"left": 28,
+		"top": 435,
+		"width": 1084,
+		"height": 741
+	},
+	"Sources/Methods/error_xml.4dm": {
+		"left": 28,
+		"top": 435,
+		"width": 1084,
+		"height": 741
+	},
+	"Sources/Methods/escape_param.4dm": {
+		"left": 28,
+		"top": 435,
+		"width": 1084,
+		"height": 741
+	},
+	"Sources/Methods/install_name_tool.4dm": {
+		"left": 28,
+		"top": 435,
+		"width": 1084,
+		"height": 741
+	},
+	"Sources/Methods/codesign.4dm": {
+		"left": 28,
+		"top": 435,
+		"width": 1084,
+		"height": 741
+	},
+	"Sources/Methods/ditto.4dm": {
+		"left": 28,
+		"top": 435,
+		"width": 1084,
+		"height": 741
+	},
+	"Sources/Methods/find_identity.4dm": {
+		"left": 28,
+		"top": 435,
+		"width": 1084,
+		"height": 741
+	},
+	"Sources/Methods/hdiutil.4dm": {
+		"left": 28,
+		"top": 435,
+		"width": 1084,
+		"height": 741
+	},
+	"Sources/Methods/xcode_get_path.4dm": {
+		"left": 28,
+		"top": 435,
+		"width": 1084,
+		"height": 741
+	},
+	"Sources/Methods/xcode_select.4dm": {
+		"left": 28,
+		"top": 435,
+		"width": 1084,
+		"height": 741
+	},
+	"Sources/Methods/xcode_SET_PATH.4dm": {
+		"left": 28,
+		"top": 435,
+		"width": 1084,
+		"height": 741
+	},
+	"Sources/Forms/TEST/method.4dm": {
+		"left": 64,
+		"top": 138,
+		"width": 864,
+		"height": 739
 	}
 }

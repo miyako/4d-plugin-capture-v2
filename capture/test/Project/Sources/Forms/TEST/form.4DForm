@@ -109,7 +109,7 @@
 					"width": 372,
 					"height": 232,
 					"fill": "transparent",
-					"stroke": "transparent",
+					"stroke": "#dc143c",
 					"sizingX": "grow",
 					"sizingY": "grow",
 					"strokeWidth": 4

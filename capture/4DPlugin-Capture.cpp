@@ -10,6 +10,8 @@
 
 #include "4DPlugin-Capture.h"
 
+#define USE_VMR9	0
+
 bool request_permission_granted = false;
 
 #if VERSIONWIN
@@ -612,7 +614,7 @@ void capture_Update(PA_PluginParameters params) {
     
     if(param) {
         
-		PA_long32 w = (PA_long32)ob_get_n(param, L"window");
+		//PA_long32 w = (PA_long32)ob_get_n(param, L"window");
         PA_long32 x = (PA_long32)ob_get_n(param, L"x");
         PA_long32 y = (PA_long32)ob_get_n(param, L"y");
         PA_long32 width = (PA_long32)ob_get_n(param, L"width");
@@ -621,7 +623,7 @@ void capture_Update(PA_PluginParameters params) {
         bool hidden = ob_get_b(param, L"hidden");
        
 		if (captureMan) {
-			captureMan->update(w, x, y, width, height, hidden);
+			captureMan->update(0, x, y, width, height, hidden);
 		}
 
     }
@@ -706,6 +708,8 @@ void capture_Start(PA_PluginParameters params) {
             bool flipV = ob_get_b(param, L"flipV");
             bool flipH = ob_get_b(param, L"flipH");
             
+            bool force = ob_get_b(param, L"force");
+            
             const char *uniqueID = NULL;
             CUTF8String _uniqueID;
             
@@ -719,15 +723,18 @@ void capture_Start(PA_PluginParameters params) {
                 
                 if(!captureMan)
                 {
-                    
+
                     captureMan = [[CaptureMan alloc]initWithUniqueID:uniqueID];
+                    force = false;/* captureMan is not instantiated yet */
                     
-                }else if(uniqueID) {
+                }else if((uniqueID) && (![captureMan isDeviceUniqueID:uniqueID])) {
+                    force = true;/* uniqueID changed; force */
+                }/* on mac we can chenge window without force */
+
+                if(force) {
                     
-                    if(![captureMan isDeviceUniqueID:uniqueID]) {
-                        [captureMan release];
-                        captureMan = [[CaptureMan alloc]initWithUniqueID:uniqueID];
-                    }
+                    [captureMan release];
+                    captureMan = [[CaptureMan alloc]initWithUniqueID:uniqueID];
                     
                 }
                 
@@ -756,6 +763,8 @@ void capture_Start(PA_PluginParameters params) {
 		PA_long32 width = (PA_long32)ob_get_n(param, L"width");
 		PA_long32 height = (PA_long32)ob_get_n(param, L"height");
 
+        bool force = ob_get_b(param, L"force");
+        
         const wchar_t *uniqueID = NULL;
         CUTF16String _uniqueID;
         
@@ -763,23 +772,37 @@ void capture_Start(PA_PluginParameters params) {
             uniqueID = (const wchar_t *)_uniqueID.c_str();
         }
 
+		const wchar_t *file = NULL;
+		CUTF16String _file;
+
+		if (ob_get_a(param, L"file", &_file)) {
+			file = (const wchar_t *)_file.c_str();
+		}
+
 		if (!captureMan)
 		{
 			captureMan = new CaptureMan();
-			captureMan->setup(uniqueID, w, x, y, width, height);
+			captureMan->setup(uniqueID, w, x, y, width, height, file);
+            force = false;/* captureMan is not instantiated yet */
 		}
 		else
 		{
-			if (captureMan->getWindowRef() != w) {
-				delete captureMan;
-				captureMan = new CaptureMan();
-				captureMan->setup(uniqueID, w, x, y, width, height);
-			}
-			else {
+			if ((w) && (captureMan->isWindowRef(w))) {
+                force = true;/* window changed; force */
+            } else if ((uniqueID) && !(captureMan->isDeviceUniqueID(uniqueID))) {
+                force = true;/* uniqueID changed; force */
+            } else {
+                force = false;
 				captureMan->update(w, x, y, width, height, false);
 			}
 
 		}
+        
+        if(force) {
+            delete captureMan;
+            captureMan = new CaptureMan();
+            captureMan->setup(uniqueID, w, x, y, width, height, file);
+        }
 
 		captureMan->startRunning();
     }
@@ -1021,25 +1044,16 @@ void capture_Devices(PA_PluginParameters params) {
 
 #if VERSIONWIN
 
-PA_long32 CaptureMan::getWindowRef() {
+ bool CaptureMan::isWindowRef(PA_long32 w) {
 
-	if (isConfigured) {
+     bool returnValue = false;
+     
+     if (isConfigured) {
+         returnValue = (windowRef == w);
+     }
 
-		return windowRef;
-
-	}
-
-	return 0;
+	return returnValue;
 }
-
-/*
-bool CaptureMan::isWindowInvalid() {
-
-HWND _windowRef = (HWND)PA_GetHWND(reinterpret_cast<PA_WindowRef>(windowRef));
-
-return (!_windowRef) && IsWindow(_windowRef);
-}
-*/
 
 bool CaptureMan::isDeviceUniqueID(const wchar_t *uniqueID) {
 
@@ -1061,9 +1075,13 @@ bool CaptureMan::isDeviceUniqueID(const wchar_t *uniqueID) {
 void CaptureMan::startRunning() {
 
 	if (isConfigured) {
-		videoWindow->put_Visible(OATRUE);
-		videoWindow->put_AutoShow(OATRUE);
-		sampleGrabber->SetBufferSamples(TRUE);
+
+		if (!USE_VMR9) {
+			videoWindow->put_Visible(OAFALSE);
+			videoWindow->put_AutoShow(OATRUE);
+			sampleGrabber->SetBufferSamples(TRUE);
+		}
+
 		mediaControl->Run();
 	}
 
@@ -1072,9 +1090,13 @@ void CaptureMan::startRunning() {
 void CaptureMan::stopRunning() {
 
 	if (isConfigured) {
-		sampleGrabber->SetBufferSamples(FALSE);
-		videoWindow->put_Visible(OAFALSE);
-		videoWindow->put_AutoShow(OAFALSE);
+
+		if (!USE_VMR9) {
+			sampleGrabber->SetBufferSamples(FALSE);
+			videoWindow->put_Visible(OAFALSE);
+			videoWindow->put_AutoShow(OAFALSE);
+		}
+
 		mediaControl->Stop();
 	}
 
@@ -1084,17 +1106,26 @@ CaptureMan::CaptureMan() {
 
 	isConfigured = false;
 
+	fileFilter = NULL;
+	sinkFilter = NULL;
 	captureGraphBuilder = NULL;
 	videoWindow = NULL;
 	mediaControl = NULL;
+	videoControl = NULL;
 	sampleGrabber = NULL;
 	grabberFilter = NULL;
 	graphBuilder = NULL;
 	deviceFilter = NULL;
 
+	windowlessControl9 = NULL;
+	filterConfig9 = NULL;
+	vmr9Filter = NULL;
 }
 
 CaptureMan::~CaptureMan() {
+
+	if (fileFilter) fileFilter->Release();
+	if (sinkFilter) sinkFilter->Release();
 
 	if (captureGraphBuilder) captureGraphBuilder->Release();
 	if (videoWindow) {
@@ -1119,6 +1150,12 @@ CaptureMan::~CaptureMan() {
 	if (graphBuilder) graphBuilder->Release();
 	if (deviceFilter) deviceFilter->Release();
 
+	if (windowlessControl9) windowlessControl9->Release();
+	if (filterConfig9) filterConfig9->Release();
+	if (vmr9Filter) vmr9Filter->Release();
+
+	fileFilter = NULL;
+	sinkFilter = NULL;
 	captureGraphBuilder = NULL;
 	videoWindow = NULL;
 	mediaControl = NULL;
@@ -1128,6 +1165,9 @@ CaptureMan::~CaptureMan() {
 	graphBuilder = NULL;
 	deviceFilter = NULL;
 
+	windowlessControl9 = NULL;
+	filterConfig9 = NULL;
+	vmr9Filter = NULL;
 }
 
 IBaseFilter *capture_getDeviceForName(const wchar_t *n, std::wstring &devicePath) {
@@ -1210,39 +1250,72 @@ IBaseFilter *capture_getDeviceForName(const wchar_t *n, std::wstring &devicePath
 
 PA_Picture CaptureMan::copyImage() {
 
-	IGraphBuilder *pGraph = graphBuilder;
-	IMediaControl *pControl = mediaControl;
-	IBaseFilter *pDeviceFilter = deviceFilter;
-	IBaseFilter *pGrabberFilter = grabberFilter;
-
-	AM_MEDIA_TYPE am_media_type;
-	ZeroMemory(&am_media_type, sizeof(am_media_type));
-
-	sampleGrabber->GetConnectedMediaType(&am_media_type);
-	VIDEOINFOHEADER *pVideoInfoHeader = (VIDEOINFOHEADER *)am_media_type.pbFormat;
-
-	long size = am_media_type.lSampleSize;
-	std::vector<uint8_t> buf(size);
-
 	if (isConfigured) {
 
-		sampleGrabber->GetCurrentBuffer(&size, (long *)&buf[0]);
+		if (!USE_VMR9) {
 
-		BITMAPFILEHEADER bmphdr;
-		memset(&bmphdr, 0, sizeof(bmphdr));
-		bmphdr.bfType = ('M' << 8) | 'B';
-		bmphdr.bfSize = sizeof(bmphdr) + sizeof(BITMAPINFOHEADER) + size;
-		bmphdr.bfOffBits = sizeof(bmphdr) + sizeof(BITMAPINFOHEADER);
+			AM_MEDIA_TYPE am_media_type;
+			ZeroMemory(&am_media_type, sizeof(am_media_type));
 
-		std::vector<uint8_t> bytes(sizeof(bmphdr) + sizeof(BITMAPINFOHEADER) + size);
-		memmove((char *)&bytes[0], &bmphdr, sizeof(bmphdr));
-		memmove((char *)&bytes[sizeof(bmphdr)], &pVideoInfoHeader->bmiHeader, sizeof(BITMAPINFOHEADER));
-		memmove((char *)&bytes[sizeof(bmphdr) + sizeof(BITMAPINFOHEADER)], &buf[0], size);
+			sampleGrabber->GetConnectedMediaType(&am_media_type);
+			VIDEOINFOHEADER *pVideoInfoHeader = (VIDEOINFOHEADER *)am_media_type.pbFormat;
 
-		return PA_CreatePicture(&bytes[0], bytes.size());
+			long size = am_media_type.lSampleSize;
+			std::vector<uint8_t> buf(size);
+
+			sampleGrabber->GetCurrentBuffer(&size, (long *)&buf[0]);
+
+			BITMAPFILEHEADER bmphdr;
+			memset(&bmphdr, 0, sizeof(bmphdr));
+			bmphdr.bfType = ('M' << 8) | 'B';
+			bmphdr.bfSize = sizeof(bmphdr) + sizeof(BITMAPINFOHEADER) + size;
+			bmphdr.bfOffBits = sizeof(bmphdr) + sizeof(BITMAPINFOHEADER);
+
+			std::vector<uint8_t> bytes(sizeof(bmphdr) + sizeof(BITMAPINFOHEADER) + size);
+			memmove((char *)&bytes[0], &bmphdr, sizeof(bmphdr));
+			memmove((char *)&bytes[sizeof(bmphdr)], &pVideoInfoHeader->bmiHeader, sizeof(BITMAPINFOHEADER));
+			memmove((char *)&bytes[sizeof(bmphdr) + sizeof(BITMAPINFOHEADER)], &buf[0], size);
+
+			return PA_CreatePicture(&bytes[0], bytes.size());
+		}
+		else {
+
+			BYTE *lpDib = NULL;
+			HRESULT hr = windowlessControl9->GetCurrentImage(&lpDib);
+			if (SUCCEEDED(hr))
+			{
+				BITMAPINFOHEADER *bmi = reinterpret_cast<BITMAPINFOHEADER*>(lpDib);
+				int w = abs(bmi->biWidth);
+				int	h = abs(bmi->biHeight);
+				bmi->biBitCount;
+				unsigned char*p = lpDib + bmi->biSize;
+				if ((bmi->biCompression == BI_RGB) && (bmi->biPlanes == 1)) {
+					if ((bmi->biBitCount == 24) || (bmi->biBitCount == 32)) {
+						size_t size = w * h * ((bmi->biBitCount == 24) ? 3 : 4);
+
+						BITMAPFILEHEADER bmphdr;
+						memset(&bmphdr, 0, sizeof(bmphdr));
+						bmphdr.bfType = ('M' << 8) | 'B';
+						bmphdr.bfSize = sizeof(bmphdr) + sizeof(BITMAPINFOHEADER) + size;
+						bmphdr.bfOffBits = sizeof(bmphdr) + sizeof(BITMAPINFOHEADER);
+
+						std::vector<uint8_t> bytes(sizeof(bmphdr) + sizeof(BITMAPINFOHEADER) + size);
+						memmove((char *)&bytes[0], &bmphdr, sizeof(bmphdr));
+						memmove((char *)&bytes[sizeof(bmphdr)], lpDib, sizeof(BITMAPINFOHEADER));
+						memmove((char *)&bytes[sizeof(bmphdr) + sizeof(BITMAPINFOHEADER)], p, size);
+
+						return PA_CreatePicture(&bytes[0], bytes.size());
+					}
+
+				}
+
+				CoTaskMemFree(lpDib);
+			}
+		}
 	}
 
-	return PA_CreatePicture(&buf[0], 0);
+	char _buf[1];
+	return PA_CreatePicture(_buf, 0);
 }
 
 void CaptureMan::update(
@@ -1262,19 +1335,72 @@ void CaptureMan::update(
 		{
 			if (windowRef != w) {
 				windowRef = w;
-				videoWindow->put_Owner((OAHWND)_windowRef);
+				if (!USE_VMR9) {
+					videoWindow->put_Owner((OAHWND)_windowRef);
+				}
+				else {
+					windowlessControl9->SetVideoClippingWindow(_windowRef);
+				}
 			}
 		}
 
-		videoWindow->SetWindowPosition(x, y, width, height);
+		if (!USE_VMR9) {
 
-		if (hidden) {
-			videoWindow->put_Visible(OAFALSE);
-			videoWindow->put_AutoShow(OAFALSE);
+			AM_MEDIA_TYPE am_media_type;
+			ZeroMemory(&am_media_type, sizeof(am_media_type));
+
+			sampleGrabber->GetConnectedMediaType(&am_media_type);
+			VIDEOINFOHEADER *pVideoInfoHeader = (VIDEOINFOHEADER *)am_media_type.pbFormat;
+
+			double h = pVideoInfoHeader->bmiHeader.biHeight;
+			double w = pVideoInfoHeader->bmiHeader.biWidth;
+			double _width = width;
+			double _height = height;
+
+			if (w > h) {
+
+				long rationalHeight = (_width * (h / w));
+				if (height > rationalHeight) {
+					y += ((height - rationalHeight) / 2);
+					height = rationalHeight;
+				}
+				else {
+					x += ((width - (_height * (w / h))) / 2);
+					width = (_height * (w / h));
+				}
+
+			}
+
+			else {
+
+				long rationalWidth = (_height * (w / h));
+				if (width > rationalWidth) {
+					x += ((width - rationalWidth) / 2);
+					width = rationalWidth;
+				}
+				else {
+					y += ((height - (_width * (h / w))) / 2);
+					height = (_width * (h / w));
+				}
+			}
+			
+			videoWindow->SetWindowPosition(x, y, width, height);
+			if (hidden) {
+				videoWindow->put_Visible(OAFALSE);
+				videoWindow->put_AutoShow(OAFALSE);
+			}
+			else {
+				videoWindow->put_Visible(OAFALSE);
+				videoWindow->put_AutoShow(OATRUE);
+			}
 		}
 		else {
-			videoWindow->put_Visible(OATRUE);
-			videoWindow->put_AutoShow(OATRUE);
+			RECT rect;
+			rect.top = y;
+			rect.bottom = y + height;
+			rect.left = x;
+			rect.right = x + width;
+			windowlessControl9->SetVideoPosition(NULL, &rect);
 		}
 	}
 }
@@ -1284,10 +1410,21 @@ void CaptureMan::setup(const wchar_t *deviceName,
 	PA_long32 x,
 	PA_long32 y,
 	PA_long32 width,
-	PA_long32 height) {
+	PA_long32 height,
+	const wchar_t *file) {
 
 	if (!isConfigured) {
 	
+		HWND _windowRef = (HWND)PA_GetHWND(reinterpret_cast<PA_WindowRef>(w));
+
+		ICaptureGraphBuilder2 *pCapture = NULL;
+
+		ISampleGrabber *pGrabber = NULL;
+		IVMRWindowlessControl9 *pVMR = NULL;
+		IVMRFilterConfig9 *pConfig = NULL;
+		IBaseFilter *pVmr9 = NULL;
+
+		IBaseFilter *pGrabberFilter = NULL;
 		IBaseFilter *pDeviceFilter = capture_getDeviceForName(deviceName, devicePath);
 
 		IGraphBuilder *pGraph = NULL;
@@ -1297,7 +1434,6 @@ void CaptureMan::setup(const wchar_t *deviceName,
 			(void **)&pGraph);
 		if (SUCCEEDED(hr)) {
 
-			ICaptureGraphBuilder2 *pCapture = NULL;
 			hr = CoCreateInstance(CLSID_CaptureGraphBuilder2,
 				NULL,
 				CLSCTX_INPROC_SERVER,
@@ -1306,134 +1442,235 @@ void CaptureMan::setup(const wchar_t *deviceName,
 
 			if (SUCCEEDED(hr)) {
 
-				IBaseFilter *pGrabberFilter = NULL;
-				hr = CoCreateInstance(CLSID_SampleGrabber,
-					NULL,
-					CLSCTX_INPROC_SERVER,
-					IID_PPV_ARGS(&pGrabberFilter));
+				if (USE_VMR9) {
+
+					hr = CoCreateInstance(CLSID_VideoMixingRenderer9,
+						NULL,
+						CLSCTX_INPROC_SERVER,
+						IID_IBaseFilter,
+						(void**)&pVmr9);
+
+					if (SUCCEEDED(hr)) {
+						hr = pGraph->AddFilter(pVmr9, L"VMR-9");
+						if (SUCCEEDED(hr)) {
+							hr = pVmr9->QueryInterface(IID_IVMRFilterConfig9, (void**)&pConfig);
+							if (SUCCEEDED(hr))
+							{
+								hr = pConfig->SetRenderingMode(VMR9Mode_Windowless);
+							}
+							hr = pVmr9->QueryInterface(IID_IVMRWindowlessControl9, (void **)&pVMR);
+							if (SUCCEEDED(hr)) {
+								hr = pVMR->SetAspectRatioMode(VMR9ARMode_LetterBox);
+								if (_windowRef)
+								{
+									windowRef = w;
+									hr = pVMR->SetVideoClippingWindow(_windowRef);
+									RECT rect;
+									rect.top = y;
+									rect.bottom = y + height;
+									rect.left = x;
+									rect.right = x + width;
+									hr = pVMR->SetVideoPosition(NULL, &rect);
+								}
+							}
+						}
+					}
+				}
+				else {
+
+					hr = CoCreateInstance(CLSID_SampleGrabber,
+						NULL,
+						CLSCTX_INPROC_SERVER,
+						IID_PPV_ARGS(&pGrabberFilter));
+					if (SUCCEEDED(hr)) {
+						hr = pGrabberFilter->QueryInterface(IID_ISampleGrabber, (void **)&pGrabber);
+						if (SUCCEEDED(hr)) {
+							//Set the Media Type
+							AM_MEDIA_TYPE mt;
+							ZeroMemory(&mt, sizeof(mt));
+							mt.majortype = MEDIATYPE_Video;
+							mt.subtype = MEDIASUBTYPE_RGB24;
+							mt.formattype = FORMAT_VideoInfo;
+							hr = pGrabber->SetMediaType(&mt);
+							if (SUCCEEDED(hr)) {
+								hr = pGraph->AddFilter(pGrabberFilter, L"Sample Grabber");
+
+							}
+						}
+					}
+				}
 
 				if (SUCCEEDED(hr)) {
 
-					ISampleGrabber *pGrabber = NULL;
-					hr = pGrabberFilter->QueryInterface(IID_ISampleGrabber, (void **)&pGrabber);
+					hr = pCapture->SetFiltergraph(pGraph);
 
 					if (SUCCEEDED(hr)) {
 
-						//Set the Media Type
-						AM_MEDIA_TYPE mt;
-						ZeroMemory(&mt, sizeof(mt));
-						mt.majortype = MEDIATYPE_Video;
-						mt.subtype = MEDIASUBTYPE_RGB24;
-						mt.formattype = FORMAT_VideoInfo;
-						hr = pGrabber->SetMediaType(&mt);
+						IMediaControl *pMControl = NULL;
+						hr = pGraph->QueryInterface(IID_IMediaControl, (void **)&pMControl);
 
 						if (SUCCEEDED(hr)) {
 
-							hr = pGraph->AddFilter(pGrabberFilter, L"Sample Grabber");
+							hr = pGraph->AddFilter(pDeviceFilter, L"Device Filter");
 
 							if (SUCCEEDED(hr)) {
 
-								hr = pCapture->SetFiltergraph(pGraph);
+								hr = pCapture->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video,
+									pDeviceFilter, IID_IAMVideoControl, (void**)&videoControl);
 
 								if (SUCCEEDED(hr)) {
 
-									IMediaControl *pMControl = NULL;
-									hr = pGraph->QueryInterface(IID_IMediaControl, (void **)&pMControl);
+									IPin* pin = NULL;
+									long caps = 0;
+
+									hr = pCapture->FindPin(
+										pDeviceFilter, PINDIR_OUTPUT, &PIN_CATEGORY_CAPTURE, NULL, FALSE, 0, &pin);
+									if (SUCCEEDED(hr)) {
+										hr = videoControl->GetCaps(pin, &caps);
+										if (SUCCEEDED(hr))
+										{
+											if ((caps & VideoControlFlag_FlipVertical) > 0)
+												caps = caps & ~(VideoControlFlag_FlipVertical);
+											if ((caps & VideoControlFlag_FlipHorizontal) != 0)
+												caps = caps & ~(VideoControlFlag_FlipHorizontal);
+
+											//videoControl->SetMode(pin, caps);
+										}
+										pin->Release();
+									}
+
+								}
+
+								IFileSinkFilter *pSink = NULL;
+								IBaseFilter *pFileOut = NULL;
+
+								if (file) {
+
+									hr = pCapture->SetOutputFileName(&MEDIASUBTYPE_Avi,
+										file, &pFileOut, &pSink);
 
 									if (SUCCEEDED(hr)) {
 
-										hr = pGraph->AddFilter(pDeviceFilter, L"Device Filter");
+										filePath = std::wstring(file);
+										hr = pCapture->RenderStream(&PIN_CATEGORY_CAPTURE,
+											&MEDIATYPE_Video,
+											pDeviceFilter,
+											NULL,
+											pFileOut);
+									}
 
-										if (SUCCEEDED(hr)) {
+								}
 
-											hr = pCapture->FindInterface(&PIN_CATEGORY_CAPTURE, &MEDIATYPE_Video,
-												pDeviceFilter, IID_IAMVideoControl, (void**)&videoControl);
+								if (USE_VMR9) {
+									hr = pCapture->RenderStream(NULL,
+										NULL,
+										pDeviceFilter,
+										pGrabberFilter,
+										pVmr9);
 
-											if (SUCCEEDED(hr)) {
+								}
+								else {
+									hr = pCapture->RenderStream(&PIN_CATEGORY_PREVIEW,
+										&MEDIATYPE_Video,
+										pDeviceFilter,
+										pGrabberFilter,
+										NULL);
+								}
 
-												IPin* pin = NULL;
-												long caps = 0;
+								if (SUCCEEDED(hr)) {
+									IVideoWindow *pVWindow = NULL;
+									hr = pGraph->QueryInterface(IID_IVideoWindow, (void **)&pVWindow);
+									if (SUCCEEDED(hr)) {
 
-												hr = pCapture->FindPin(
-													pDeviceFilter, PINDIR_OUTPUT, &PIN_CATEGORY_CAPTURE, NULL, FALSE, 0, &pin);
-												if (SUCCEEDED(hr)) {
-													hr = videoControl->GetCaps(pin, &caps);
-													if (SUCCEEDED(hr))
-													{
-														if ((caps & VideoControlFlag_FlipVertical) > 0)
-															caps = caps & ~(VideoControlFlag_FlipVertical);
-														if ((caps & VideoControlFlag_FlipHorizontal) != 0)
-															caps = caps & ~(VideoControlFlag_FlipHorizontal);
+										if (_windowRef)
+										{
+											windowRef = w;
 
-														//videoControl->SetMode(pin, caps);
+											if (!USE_VMR9) {
+
+												AM_MEDIA_TYPE am_media_type;
+												ZeroMemory(&am_media_type, sizeof(am_media_type));
+
+												pGrabber->GetConnectedMediaType(&am_media_type);
+												VIDEOINFOHEADER *pVideoInfoHeader = (VIDEOINFOHEADER *)am_media_type.pbFormat;
+
+												double h = pVideoInfoHeader->bmiHeader.biHeight;
+												double w = pVideoInfoHeader->bmiHeader.biWidth;
+												double _width = width;
+												double _height = height;
+
+												if (w > h) {
+
+													long rationalHeight = (_width * (h / w));
+													if (height > rationalHeight) {
+														y += ((height - rationalHeight) / 2);
+														height = rationalHeight;
 													}
-													pin->Release();
+													else {
+														x += ((width - (_height * (w / h))) / 2);
+														width = (_height * (w / h));
+													}
+
 												}
 
+												else {
+
+													long rationalWidth = (_height * (w / h));
+													if (width > rationalWidth) {
+														x += ((width - rationalWidth) / 2);
+														width = rationalWidth;
+													}
+													else {
+														y += ((height - (_width * (h / w))) / 2);
+														height = (_width * (h / w));
+													}
+												}
+
+												pVWindow->put_Owner((OAHWND)_windowRef);
+												pVWindow->put_Visible(OAFALSE);
+												pVWindow->put_AutoShow(OATRUE);
+												pVWindow->SetWindowPosition(x, y, width, height);
+												pVWindow->HideCursor(OAFALSE);
+												pVWindow->put_WindowStyle(WS_CHILD | WS_CLIPCHILDREN);
 											}
 
-											hr = pCapture->RenderStream(&PIN_CATEGORY_PREVIEW,
-												NULL,
-												pDeviceFilter,
-												pGrabberFilter,
-												NULL);
+											deviceFilter = pDeviceFilter;
+											mediaControl = pMControl;
+											videoWindow = pVWindow;
+											graphBuilder = pGraph;
+											grabberFilter = pGrabberFilter;
+											sampleGrabber = pGrabber;
+											captureGraphBuilder = pCapture;
 
-											if (SUCCEEDED(hr)) {
-												IVideoWindow *pVWindow = NULL;
-												hr = pGraph->QueryInterface(IID_IVideoWindow, (void **)&pVWindow);
-												if (SUCCEEDED(hr)) {
+											windowlessControl9 = pVMR;
+											filterConfig9 = pConfig;
+											vmr9Filter = pVmr9;
 
-													HWND _windowRef = (HWND)PA_GetHWND(reinterpret_cast<PA_WindowRef>(w));
+											mediaControl->Pause();
 
-													if (_windowRef)
-													{
-														windowRef = w;
-														pVWindow->put_Owner((OAHWND)_windowRef);
-
-														pVWindow->put_Visible(OATRUE);
-														pVWindow->put_AutoShow(OATRUE);
-
-														pVWindow->SetWindowPosition(x, y, width, height);
-
-														pVWindow->HideCursor(OAFALSE);
-														pVWindow->put_WindowStyle(WS_CHILD | WS_CLIPCHILDREN);
-
-														deviceFilter = pDeviceFilter;
-														mediaControl = pMControl;
-														videoWindow = pVWindow;
-														graphBuilder = pGraph;
-														grabberFilter = pGrabberFilter;
-														sampleGrabber = pGrabber;
-														captureGraphBuilder = pCapture;
-
-														mediaControl->Pause();
-														sampleGrabber->SetBufferSamples(FALSE);
-
-														isConfigured = true;
-
-													}	
-
-												}//QueryInterface
-
+											if (!USE_VMR9) {
+												sampleGrabber->SetBufferSamples(FALSE);
 											}
 
-										}//AddFilter (Device Filter)
+											isConfigured = true;
 
-									}//pMControl
+										}
 
-								}//SetFiltergraph
+									}//QueryInterface
 
-							}//AddFilter (Sample Grabber)
+								}
 
-						}//SetMediaType
+							}//AddFilter (Device Filter)
 
-					}//pGrabber
+						}//pMControl
 
-				}//pGrabberFilter
+					}//SetFiltergraph
 
-			}//pCapture
+				}//AddFilter (Sample Grabber)
 
-		}//pGraph
+			}
+
+		}
 
 	}
 

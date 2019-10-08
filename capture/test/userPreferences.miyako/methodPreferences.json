@@ -387,18 +387,20 @@
 		"stamp": "2019-10-07T01:25:46.787Z"
 	},
 	"Sources/Forms/TEST/method.4dm": {
-		"startSelection": 0,
-		"endSelection": 0,
-		"firstSelectedLine": 18,
-		"lastSelectedLine": 18,
+		"startSelection": 48,
+		"endSelection": 48,
+		"firstSelectedLine": 9,
+		"lastSelectedLine": 9,
 		"folding": [
+			3,
 			7,
-			28,
-			43,
-			54,
-			69
+			17,
+			38,
+			47,
+			58,
+			73
 		],
 		"bookmarks": [],
-		"stamp": "2019-10-07T07:04:30.780Z"
+		"stamp": "2019-10-07T13:44:42.155Z"
 	}
 }

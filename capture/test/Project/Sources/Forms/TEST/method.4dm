@@ -30,6 +30,10 @@ Case of
 		
 		SET TIMER:C645(0)
 		
+		If (Is Windows:C1573)
+			  //Form.file:=System folder(Desktop)+"test.avi"
+		End if 
+		
 		capture Start (Form:C1466)
 		
 	: ($event=On Load:K2:1)

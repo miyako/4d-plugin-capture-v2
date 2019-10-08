@@ -23,6 +23,8 @@
 #pragma comment(lib, "shlwapi")
 #include <map>
 #include <mutex>
+#include <d3d9.h>
+#include <vmr9.h>
 
 class ComInitClass {
     
@@ -66,14 +68,21 @@ private:
     ICaptureGraphBuilder2 *captureGraphBuilder;
     ISampleGrabber    *sampleGrabber;
 	IAMVideoControl	*videoControl;
+	IFileSinkFilter *sinkFilter;
+	IBaseFilter *fileFilter;
     PA_long32        windowRef;
 	std::wstring devicePath;
+	std::wstring filePath;
+
+	IVMRWindowlessControl9 *windowlessControl9;
+	IVMRFilterConfig9 *filterConfig9;
+	IBaseFilter *vmr9Filter;
 
     bool isConfigured;
     
 public:
     
-	PA_long32 getWindowRef();
+	bool isWindowRef(PA_long32 w);
 	bool isDeviceUniqueID(const wchar_t *uniqueID);
     void startRunning();
     void stopRunning();
@@ -91,7 +100,8 @@ public:
 		PA_long32 x,
 		PA_long32 y,
 		PA_long32 width,
-		PA_long32 height);
+		PA_long32 height,
+		const wchar_t *file);
 
     PA_Picture copyImage();
 

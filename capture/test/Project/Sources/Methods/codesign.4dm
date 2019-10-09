@@ -6,20 +6,25 @@ $status:=New object:C1471("success";False:C215)
 
 If (Is macOS:C1572)
 	
+	$cp:=Count parameters:C259
 	  //$1
-	If (Value type:C1509($1)#Is undefined:K8:13)
+	If ($cp>0)
 		$applicationPath:=$1
-	Else 
+	End if 
+	
+	If ($applicationPath="")
 		  //default:current application
 		$applicationPath:=Application file:C491
 	End if 
 	
 	  //$2
-	If (Value type:C1509($2)#Is undefined:K8:13)
+	If ($cp>1)
 		$signingIdentity:=$2
-	Else 
+	End if 
+	
+	If ($signingIdentity="")
 		  //default: first Developer ID Application certificate
-		$identity:=find_identity
+		$identity:=find_identity 
 		$identity:=$identity.query("name == :1";"Developer ID Application:@")
 		If ($identity.length#0)
 			$signingIdentity:=$identity[0].name
@@ -61,24 +66,24 @@ If (Is macOS:C1572)
 		$entitlements["com.apple.security.cs.disable-library-validation"]:=True:C214
 		  // whether the app may load plug-ins or frameworks signed by other developers
 		
-		$entitlements["com.apple.security.get-task-allow"]:=True:C214
+		$entitlements["com.apple.security.get-task-allow"]:=True:C214  //need this for debugging
 		
-		$entitlements["com.apple.security.device.audio-input"]:=False:C215
+		$entitlements["com.apple.security.device.audio-input"]:=True:C214
 		  // whether the app may record audio using the built-in microphone and access audio input using Core Audio
-		$entitlements["com.apple.security.device.camera"]:=False:C215
+		$entitlements["com.apple.security.device.camera"]:=True:C214
 		  // whether the app may capture movies and still images using the built-in camera
-		$entitlements["com.apple.security.personal-information.photos-library"]:=False:C215
+		$entitlements["com.apple.security.personal-information.photos-library"]:=True:C214
 		  // whether the app may have read-write access to the user's Photos library
-		$entitlements["com.apple.security.personal-information.location"]:=False:C215
+		$entitlements["com.apple.security.personal-information.location"]:=True:C214
 		  // whether the app may access location information from Location Services
-		$entitlements["com.apple.security.personal-information.addressbook"]:=False:C215
+		$entitlements["com.apple.security.personal-information.addressbook"]:=True:C214
 		  // whether the app may have read-write access to contacts in the user's address book
-		$entitlements["com.apple.security.personal-information.calendars"]:=False:C215
+		$entitlements["com.apple.security.personal-information.calendars"]:=True:C214
 		  // whether the app may have read-write access to the user's calendar
 	End if 
 	
 	  //$3: plist keys
-	If (Value type:C1509($3)=Is object:K8:27)
+	If ($cp>2)
 		If ($3#Null:C1517)
 			For each ($key;$3)
 				$keys[$key]:=$3[$key]
@@ -87,12 +92,22 @@ If (Is macOS:C1572)
 	End if 
 	
 	  //$4: entitlements
-	If (Value type:C1509($4)=Is object:K8:27)
+	$signWithEntitlements:=False:C215
+	If ($cp>3)
 		If ($4#Null:C1517)
 			For each ($key;$4)
 				$entitlements[$key]:=$4[$key]
 			End for each 
+			$signWithEntitlements:=True:C214
 		End if 
+	End if 
+	
+	  //$5: options
+	$removeSignature:=False:C215
+	$useLocalTimestamp:=False:C215
+	If ($cp>4)
+		$removeSignature:=Bool:C1537($5.remove)
+		$useLocalTimestamp:=Bool:C1537($5.local)
 	End if 
 	
 	C_LONGINT:C283($i)
@@ -213,7 +228,7 @@ If (Is macOS:C1572)
 		  //not a package, no plist
 	End if 
 	
-	If (Bool:C1537($5.remove))
+	If ($removeSignature)
 		
 		If (Test path name:C476($applicationPath)=Is a folder:K24:2)
 			
@@ -227,24 +242,24 @@ If (Is macOS:C1572)
 		
 	End if 
 	
-	If (Bool:C1537($5.remove))
+	If ($removeSignature)
 		$command:="codesign --remove-signature "+\
 			escape_param ($applicationPathObject.name+$applicationPathObject.extension)
 	Else 
-		If (Bool:C1537($5.local))
+		If ($useLocalTimestamp)
 			$command:="codesign --verbose --deep "
 		Else 
 			$command:="codesign --verbose --deep --timestamp "
 		End if 
-		If (Bool:C1537($5.force))
+		If ($removeSignature)
 			$command:=$command+"--force "
 		End if 
 		
 	End if 
 	
-	If (Not:C34(Bool:C1537($5.remove)))
+	If (Not:C34($removeSignature))
 		
-		If (Value type:C1509($4)=Is undefined:K8:13) | ($4=Null:C1517)
+		If ($signWithEntitlements)
 			
 			  //no hardened runtime
 			$command:=$command+" --sign "+\

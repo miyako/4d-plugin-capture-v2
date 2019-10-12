@@ -9,7 +9,7 @@
         },
         {
             "theme": "capture",
-            "syntax": "capture Start(&J):J",
+            "syntax": "capture Start(&J)",
             "threadSafe": true
         },
         {

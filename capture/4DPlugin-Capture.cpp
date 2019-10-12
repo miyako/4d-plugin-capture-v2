@@ -301,7 +301,12 @@ void addSublayer(addSublayerCtx *ctx) {
 
 -(void)onStartRunning : (NSNotification *)notification
 {
-
+    /* none these work convincingly; use redraw window inside 4D */
+    
+//    [[superLayerView window] display];
+    [superLayerView updateLayer];
+    [[superLayerView window] update];
+//    [[superLayerView window] setViewsNeedDisplay:YES];
 }
 
 -(void)onSessionRuntimeError : (NSNotification *)notification
@@ -747,6 +752,7 @@ void capture_Start(PA_PluginParameters params) {
                 [captureMan setPreviewLayerView:contentView frame:rect flipH:flipH flipV:flipV];
                 
                 [captureMan performSelectorInBackground:@selector(startRunning) withObject:nil];
+                
             }
         }
     }

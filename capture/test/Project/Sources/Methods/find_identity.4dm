@@ -1,4 +1,4 @@
-//%attributes = {}
+//%attributes = {"invisible":true}
 C_COLLECTION:C1488($0;$identity)
 
 $identity:=New collection:C1472
@@ -7,7 +7,9 @@ If (Is macOS:C1572)
 	C_BLOB:C604($stdIn;$stdOut;$stdErr)
 	C_LONGINT:C283($pid)
 	SET ENVIRONMENT VARIABLE:C812("_4D_OPTION_BLOCKING_EXTERNAL_PROCESS";"TRUE")
-	LAUNCH EXTERNAL PROCESS:C811("security find-identity -p codesigning -v";$stdIn;$stdOut;$stdErr;$pid)
+	LAUNCH EXTERNAL PROCESS:C811("security find-identity -p basic -v";$stdIn;$stdOut;$stdErr;$pid)
+	
+	  //basic, to include installer (codesigning does not include it)
 	
 	$info:=Convert to text:C1012($stdOut;"utf-8")
 	

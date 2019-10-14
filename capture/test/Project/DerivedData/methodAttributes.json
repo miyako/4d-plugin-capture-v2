@@ -1,16 +1,28 @@
 ﻿{
 	"methods": {
 		"codesign": {
-			"timeStamp": "2019-10-14T14:14:09.774Z"
+			"timeStamp": "2019-10-14T16:01:16.181Z",
+			"attributes": {
+				"invisible": true
+			}
 		},
 		"hdiutil": {
-			"timeStamp": "2019-10-07T01:24:59.000Z"
+			"timeStamp": "2019-10-14T16:01:35.788Z",
+			"attributes": {
+				"invisible": true
+			}
 		},
 		"ditto": {
-			"timeStamp": "2019-10-07T01:24:31.000Z"
+			"timeStamp": "2019-10-14T16:01:00.342Z",
+			"attributes": {
+				"invisible": true
+			}
 		},
 		"xcode_get_path": {
-			"timeStamp": "2019-10-07T01:25:13.000Z"
+			"timeStamp": "2019-10-14T16:02:17.698Z",
+			"attributes": {
+				"invisible": true
+			}
 		},
 		"generate_file_from_template": {
 			"timeStamp": "2019-07-29T04:26:04.000Z",
@@ -34,16 +46,28 @@
 			}
 		},
 		"find_identity": {
-			"timeStamp": "2019-10-07T01:24:43.000Z"
+			"timeStamp": "2019-10-14T16:00:30.972Z",
+			"attributes": {
+				"invisible": true
+			}
 		},
 		"xcode_select": {
-			"timeStamp": "2019-10-07T01:25:26.000Z"
+			"timeStamp": "2019-10-14T16:02:22.289Z",
+			"attributes": {
+				"invisible": true
+			}
 		},
 		"install_name_tool": {
-			"timeStamp": "2019-10-07T01:24:05.000Z"
+			"timeStamp": "2019-10-14T16:01:57.733Z",
+			"attributes": {
+				"invisible": true
+			}
 		},
 		"xcode_SET_PATH": {
-			"timeStamp": "2019-10-07T01:25:46.000Z"
+			"timeStamp": "2019-10-14T16:02:26.848Z",
+			"attributes": {
+				"invisible": true
+			}
 		},
 		"generate_project_xcode": {
 			"timeStamp": "2019-07-02T13:57:13.000Z",
@@ -52,11 +76,20 @@
 				"preemptive": "capable"
 			}
 		},
+		"pkgbuild": {
+			"timeStamp": "2019-10-14T16:00:12.678Z",
+			"attributes": {
+				"invisible": true
+			}
+		},
 		"TEST": {
 			"timeStamp": "2019-10-14T14:13:59.669Z"
 		},
 		"altool": {
-			"timeStamp": "2019-10-07T01:23:25.000Z"
+			"timeStamp": "2019-10-14T16:02:06.570Z",
+			"attributes": {
+				"invisible": true
+			}
 		},
 		"generate_project": {
 			"timeStamp": "2019-10-03T02:17:03.000Z"
@@ -69,7 +102,10 @@
 			}
 		},
 		"error_xml": {
-			"timeStamp": "2019-10-07T01:23:40.000Z"
+			"timeStamp": "2019-10-14T16:00:45.248Z",
+			"attributes": {
+				"invisible": true
+			}
 		},
 		"generate_project_plugin_stub": {
 			"timeStamp": "2019-07-23T08:36:58.000Z",
@@ -86,7 +122,10 @@
 			}
 		},
 		"escape_param": {
-			"timeStamp": "2019-10-07T01:23:51.000Z"
+			"timeStamp": "2019-10-14T16:00:37.641Z",
+			"attributes": {
+				"invisible": true
+			}
 		}
 	}
 }

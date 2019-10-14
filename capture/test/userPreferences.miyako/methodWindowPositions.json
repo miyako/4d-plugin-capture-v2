@@ -252,10 +252,10 @@
 		"height": 741
 	},
 	"Sources/Methods/codesign.4dm": {
-		"left": 147,
-		"top": 254,
-		"width": 1179,
-		"height": 606
+		"left": 611,
+		"top": 665,
+		"width": 1347,
+		"height": 725
 	},
 	"Sources/Methods/ditto.4dm": {
 		"left": 28,
@@ -264,8 +264,8 @@
 		"height": 741
 	},
 	"Sources/Methods/find_identity.4dm": {
-		"left": 28,
-		"top": 435,
+		"left": 43,
+		"top": 486,
 		"width": 1084,
 		"height": 741
 	},
@@ -298,5 +298,11 @@
 		"top": 234,
 		"width": 380,
 		"height": 415
+	},
+	"Sources/Methods/pkgbuild.4dm": {
+		"left": 747,
+		"top": 548,
+		"width": 778,
+		"height": 488
 	}
 }

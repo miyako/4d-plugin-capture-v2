@@ -1,8 +1,4 @@
 //%attributes = {}
-  //no special permission is required simple list devices
-C_COLLECTION:C1488($devices)
-$devices:=capture Devices 
-
 If (False:C215)
 	
 	$xcode:=xcode_get_path   //xcode-select -p
@@ -18,9 +14,8 @@ If ($identity.length#0)
 	$signingIdentity:=$identity[0].name
 End if 
 
-C_OBJECT:C1216($noEntitlements)  //alias for Null: no entitlements
+C_OBJECT:C1216($noEntitlements;$noOptions)  //alias for Null: no entitlements
 $entitlements:=New object:C1471  //empty object: default entitlements
-$entitlements["com.apple.security.device.camera"]:=True:C214
 
 $plist:=New object:C1471  //empty object: use current plist (no change)
 
@@ -28,9 +23,9 @@ $plist:=New object:C1471  //empty object: use current plist (no change)
 $force:=New object:C1471("force";True:C214)
 $remove:=New object:C1471("remove";True:C214)
 
-$path:="Macintosh HD:Applications:4D:4D v17 R6:4D.app"  //without folder separator
+$path:="Macintosh HD:Applications:4D:4D v17.3:4D.app:"
 
-$versionID:="v35"  //for natarisation
+$versionID:="v1"
 
 $signApp:=True:C214
 $signNativeComponents:=True:C214
@@ -48,6 +43,10 @@ $signUpdater:=True:C214
 $statuses:=New collection:C1472
 ARRAY TEXT:C222($componentPaths;0)
 
+If ($path[[Length:C16($path)]]=Folder separator:K24:12)
+	$path:=Substring:C12($path;1;Length:C16($path)-1)
+End if 
+
 If ($signApp)
 	
 	  //codesign: inside ===> outside
@@ -58,23 +57,33 @@ If ($signApp)
 	If ($signNativeComponents)
 		  //--remove-signature, because CEF has nested code
 		$componentPath:=$path+New collection:C1472("";"Contents";"Native Components";"").join(Folder separator:K24:12)
-		FOLDER LIST:C473($componentPath;$componentPaths)
-		For ($i;1;Size of array:C274($componentPaths))
-			codesign ($componentPath+$componentPaths{$i};$signingIdentity;$plist;$noentitlements;$remove)
-		End for 
+		If (Test path name:C476($componentPath)=Is a folder:K24:2)
+			FOLDER LIST:C473($componentPath;$componentPaths)
+			For ($i;1;Size of array:C274($componentPaths))
+				codesign ($componentPath+$componentPaths{$i};$signingIdentity;$plist;$noentitlements;$remove)
+			End for 
+		End if 
 	End if 
 	
 	If ($signHelpers)
 		  //for 17.x
 		$componentPath:=$path+New collection:C1472("";"Contents";"MacOS";"HelperTool").join(Folder separator:K24:12)
-		$statuses.push(codesign ($componentPath;$signingIdentity;$plist;$entitlements;$force))
+		If (Test path name:C476($componentPath)=Is a document:K24:1)
+			$statuses.push(codesign ($componentPath;$signingIdentity;$plist;$entitlements;$force))
+		End if 
 		$componentPath:=$path+New collection:C1472("";"Contents";"MacOS";"InstallTool").join(Folder separator:K24:12)
-		$statuses.push(codesign ($componentPath;$signingIdentity;$plist;$entitlements;$force))
+		If (Test path name:C476($componentPath)=Is a document:K24:1)
+			$statuses.push(codesign ($componentPath;$signingIdentity;$plist;$entitlements;$force))
+		End if 
 		  //for R release
 		$componentPath:=$path+New collection:C1472("";"Contents";"MacOS";"InstallTool.app";"Contents";"Library";"LaunchServices";"com.4D.Helper").join(Folder separator:K24:12)
-		$statuses.push(codesign ($componentPath;$signingIdentity;$plist;$entitlements;$force))
+		If (Test path name:C476($componentPath)=Is a document:K24:1)
+			$statuses.push(codesign ($componentPath;$signingIdentity;$plist;$entitlements;$force))
+		End if 
 		$componentPath:=$path+New collection:C1472("";"Contents";"MacOS";"InstallTool.app";"").join(Folder separator:K24:12)
-		$statuses.push(codesign ($componentPath;$signingIdentity;$plist;$entitlements;$force))
+		If (Test path name:C476($componentPath)=Is a document:K24:1)
+			$statuses.push(codesign ($componentPath;$signingIdentity;$plist;$entitlements;$force))
+		End if 
 	End if 
 	
 	If ($signNativeComponents)
@@ -92,12 +101,18 @@ If ($signApp)
 		  //sign with hardened runtime because this is an app
 		$componentPath:=$path+New collection:C1472("";"Contents";"Native Components";"WebViewerCEF.bundle";"Contents";"Frameworks";"4D Helper.app";"").join(Folder separator:K24:12)
 		$statuses.push(codesign ($componentPath;$signingIdentity;$plist;$entitlements;$force))
+		
 		  //first, sign dylibs
 		$componentPath:=$path+New collection:C1472("";"Contents";"Native Components";"WebViewerCEF.bundle";"Contents";"Frameworks";"Chromium Embedded Framework.framework";"Libraries";"").join(Folder separator:K24:12)
-		DOCUMENT LIST:C474($componentPath;$componentPaths;Recursive parsing:K24:13 | Ignore invisible:K24:16 | Absolute path:K24:14)
-		For ($i;1;Size of array:C274($componentPaths))
-			$statuses.push(codesign ($componentPaths{$i};$signingIdentity;$plist;$noentitlements;$force))
-		End for 
+		
+		  //for R release
+		If (Test path name:C476($componentPath)=Is a folder:K24:2)
+			DOCUMENT LIST:C474($componentPath;$componentPaths;Recursive parsing:K24:13 | Ignore invisible:K24:16 | Absolute path:K24:14)
+			For ($i;1;Size of array:C274($componentPaths))
+				$statuses.push(codesign ($componentPaths{$i};$signingIdentity;$plist;$noentitlements;$force))
+			End for 
+		End if 
+		
 		  //next, sign Chromium Embedded Framework
 		$componentPath:=$path+New collection:C1472("";"Contents";"Native Components";"WebViewerCEF.bundle";"Contents";"Frameworks";"Chromium Embedded Framework.framework";"").join(Folder separator:K24:12)
 		$statuses.push(codesign ($componentPath;$signingIdentity;$plist;$noentitlements;$force))
@@ -106,7 +121,7 @@ If ($signApp)
 		$componentPath:=$path+New collection:C1472("";"Contents";"Native Components";"").join(Folder separator:K24:12)
 		FOLDER LIST:C473($componentPath;$componentPaths)
 		For ($i;1;Size of array:C274($componentPaths))
-			$statuses.push(codesign ($componentPath+$componentPaths{$i};$signingIdentity;$plist;$noentitlements))
+			$statuses.push(codesign ($componentPath+$componentPaths{$i};$signingIdentity;$plist;$noentitlements;$noOptions))
 		End for 
 	End if 
 	
@@ -172,12 +187,11 @@ If ($signApp)
 	End if 
 	
 	  //the app 
-	$statuses.push(codesign ($path;$signingIdentity;$plist;$entitlements))
+	$statuses.push(codesign ($path;$signingIdentity;$plist;$entitlements;$noOptions))
 	
 End if 
 
-TRACE:C157  //codesign done; stop here if you don't care for notarisation
-
+TRACE:C157
 
 $statuses.push(hdiutil ($path;System folder:C487(Desktop:K41:16)+$versionID+Folder separator:K24:12))  //larger, but faster than ditto (zip)
 
@@ -192,6 +206,8 @@ $params.file:=System folder:C487(Desktop:K41:16)+$versionID+Folder separator:K24
 
 $params.primaryBundleId:="com.4D."+$versionID
 $params.username:="keisuke.miyako@4d.com"  //account
-$params.password:="@keychain:altool"  //location for app specific password (defined in appleid.apple.com)
+$params.password:="@keychain:altool"  //location for app specific password
 
 $status:=altool ($params)
+
+TRACE:C157

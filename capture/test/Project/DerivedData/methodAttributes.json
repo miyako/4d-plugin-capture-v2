@@ -1,7 +1,7 @@
 ﻿{
 	"methods": {
 		"codesign": {
-			"timeStamp": "2019-10-09T09:13:21.035Z"
+			"timeStamp": "2019-10-14T14:14:09.774Z"
 		},
 		"hdiutil": {
 			"timeStamp": "2019-10-07T01:24:59.000Z"
@@ -53,7 +53,7 @@
 			}
 		},
 		"TEST": {
-			"timeStamp": "2019-10-07T01:39:38.000Z"
+			"timeStamp": "2019-10-14T14:13:59.669Z"
 		},
 		"altool": {
 			"timeStamp": "2019-10-07T01:23:25.000Z"

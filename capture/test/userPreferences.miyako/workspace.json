@@ -1,15 +1,32 @@
 ﻿{
 	"editors": [
 		{
+			"type": "explorer"
+		},
+		{
 			"type": "method",
 			"id": 2147483647,
+			"previousTabType": "form",
+			"previousTabID": 1,
 			"codeDescriptor": {
 				"type": 1,
 				"methodName": "codesign"
 			}
 		},
 		{
-			"type": "explorer"
+			"type": "form",
+			"id": 1,
+			"previousTabType": "method",
+			"previousTabID": 2147483635,
+			"formName": "TEST"
+		},
+		{
+			"type": "method",
+			"id": 2147483635,
+			"codeDescriptor": {
+				"type": 1,
+				"methodName": "TEST"
+			}
 		}
 	]
 }

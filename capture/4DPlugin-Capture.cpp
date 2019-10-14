@@ -829,7 +829,7 @@ request_permission_t requestPermission(AVMediaType mediaType) {
 		break;
 
 	case AVAuthorizationStatusNotDetermined:
-		[AVCaptureDevice requestAccessForMediaType : AVMediaTypeVideo completionHandler : ^ (BOOL granted) {
+		[AVCaptureDevice requestAccessForMediaType : mediaType completionHandler : ^ (BOOL granted) {
 			if (granted) {
 				request_permission_granted = true;
 			}

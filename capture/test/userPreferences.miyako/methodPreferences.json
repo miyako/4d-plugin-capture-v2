@@ -288,103 +288,103 @@
 		"stamp": "2019-10-04T08:53:12.221Z"
 	},
 	"Sources/Methods/altool.4dm": {
-		"startSelection": 11,
-		"endSelection": 11,
-		"firstSelectedLine": 105,
-		"lastSelectedLine": 105,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-07T01:23:25.494Z"
-	},
-	"Sources/Methods/error_xml.4dm": {
-		"startSelection": 4,
-		"endSelection": 4,
+		"startSelection": 0,
+		"endSelection": 0,
 		"firstSelectedLine": 0,
 		"lastSelectedLine": 0,
 		"folding": [],
 		"bookmarks": [],
-		"stamp": "2019-10-07T01:23:40.552Z"
+		"stamp": "2019-10-14T16:02:06.570Z"
 	},
-	"Sources/Methods/escape_param.4dm": {
-		"startSelection": 10,
-		"endSelection": 10,
-		"firstSelectedLine": 14,
-		"lastSelectedLine": 14,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-07T01:23:51.936Z"
-	},
-	"Sources/Methods/install_name_tool.4dm": {
-		"startSelection": 11,
-		"endSelection": 11,
-		"firstSelectedLine": 42,
-		"lastSelectedLine": 42,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-07T01:24:05.136Z"
-	},
-	"Sources/Methods/codesign.4dm": {
+	"Sources/Methods/error_xml.4dm": {
 		"startSelection": 0,
 		"endSelection": 0,
-		"firstSelectedLine": 301,
-		"lastSelectedLine": 301,
+		"firstSelectedLine": 0,
+		"lastSelectedLine": 0,
 		"folding": [],
 		"bookmarks": [],
-		"stamp": "2019-10-14T14:14:09.774Z"
+		"stamp": "2019-10-14T16:00:45.248Z"
+	},
+	"Sources/Methods/escape_param.4dm": {
+		"startSelection": 0,
+		"endSelection": 0,
+		"firstSelectedLine": 0,
+		"lastSelectedLine": 0,
+		"folding": [],
+		"bookmarks": [],
+		"stamp": "2019-10-14T16:00:37.641Z"
+	},
+	"Sources/Methods/install_name_tool.4dm": {
+		"startSelection": 0,
+		"endSelection": 0,
+		"firstSelectedLine": 0,
+		"lastSelectedLine": 0,
+		"folding": [],
+		"bookmarks": [],
+		"stamp": "2019-10-14T16:01:57.733Z"
+	},
+	"Sources/Methods/codesign.4dm": {
+		"startSelection": 11,
+		"endSelection": 11,
+		"firstSelectedLine": 319,
+		"lastSelectedLine": 319,
+		"folding": [],
+		"bookmarks": [],
+		"stamp": "2019-10-14T16:01:16.181Z"
 	},
 	"Sources/Methods/ditto.4dm": {
 		"startSelection": 7,
 		"endSelection": 7,
-		"firstSelectedLine": 44,
-		"lastSelectedLine": 44,
+		"firstSelectedLine": 50,
+		"lastSelectedLine": 50,
 		"folding": [],
 		"bookmarks": [],
-		"stamp": "2019-10-07T01:24:31.992Z"
+		"stamp": "2019-10-14T16:01:00.342Z"
 	},
 	"Sources/Methods/find_identity.4dm": {
 		"startSelection": 0,
 		"endSelection": 0,
-		"firstSelectedLine": 23,
-		"lastSelectedLine": 23,
+		"firstSelectedLine": 25,
+		"lastSelectedLine": 25,
 		"folding": [],
 		"bookmarks": [],
-		"stamp": "2019-10-07T01:24:43.646Z"
+		"stamp": "2019-10-14T16:00:30.972Z"
 	},
 	"Sources/Methods/hdiutil.4dm": {
 		"startSelection": 11,
 		"endSelection": 11,
-		"firstSelectedLine": 78,
-		"lastSelectedLine": 78,
+		"firstSelectedLine": 84,
+		"lastSelectedLine": 84,
 		"folding": [],
 		"bookmarks": [],
-		"stamp": "2019-10-07T01:24:59.771Z"
+		"stamp": "2019-10-14T16:01:35.788Z"
 	},
 	"Sources/Methods/xcode_get_path.4dm": {
-		"startSelection": 9,
-		"endSelection": 9,
-		"firstSelectedLine": 39,
-		"lastSelectedLine": 39,
+		"startSelection": 0,
+		"endSelection": 0,
+		"firstSelectedLine": 0,
+		"lastSelectedLine": 0,
 		"folding": [],
 		"bookmarks": [],
-		"stamp": "2019-10-07T01:25:13.864Z"
+		"stamp": "2019-10-14T16:02:17.698Z"
 	},
 	"Sources/Methods/xcode_select.4dm": {
-		"startSelection": 7,
-		"endSelection": 7,
-		"firstSelectedLine": 7,
-		"lastSelectedLine": 7,
+		"startSelection": 0,
+		"endSelection": 0,
+		"firstSelectedLine": 0,
+		"lastSelectedLine": 0,
 		"folding": [],
 		"bookmarks": [],
-		"stamp": "2019-10-07T01:25:26.689Z"
+		"stamp": "2019-10-14T16:02:22.289Z"
 	},
 	"Sources/Methods/xcode_SET_PATH.4dm": {
-		"startSelection": 7,
-		"endSelection": 7,
-		"firstSelectedLine": 30,
-		"lastSelectedLine": 30,
+		"startSelection": 0,
+		"endSelection": 0,
+		"firstSelectedLine": 0,
+		"lastSelectedLine": 0,
 		"folding": [],
 		"bookmarks": [],
-		"stamp": "2019-10-07T01:25:46.787Z"
+		"stamp": "2019-10-14T16:02:26.848Z"
 	},
 	"Sources/Forms/TEST/method.4dm": {
 		"startSelection": 48,
@@ -402,5 +402,14 @@
 		],
 		"bookmarks": [],
 		"stamp": "2019-10-07T13:44:42.155Z"
+	},
+	"Sources/Methods/pkgbuild.4dm": {
+		"startSelection": 11,
+		"endSelection": 11,
+		"firstSelectedLine": 105,
+		"lastSelectedLine": 105,
+		"folding": [],
+		"bookmarks": [],
+		"stamp": "2019-10-14T16:00:12.678Z"
 	}
 }

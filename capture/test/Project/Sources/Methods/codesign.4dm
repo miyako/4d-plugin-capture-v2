@@ -1,4 +1,4 @@
-//%attributes = {}
+//%attributes = {"invisible":true}
 C_TEXT:C284($1;$applicationPath;$2;$signingIdentity;$key)
 C_OBJECT:C1216($3;$keys;$4;$entitlements;$5;$options;$0;$status)
 

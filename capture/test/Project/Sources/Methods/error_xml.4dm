@@ -1,2 +1,1 @@
-//%attributes = {}
-IDLE:C311
+﻿//%attributes = {"invisible":true}IDLE:C311

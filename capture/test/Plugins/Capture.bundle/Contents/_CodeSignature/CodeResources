@@ -8,7 +8,7 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			XpQ+5Nexr0BmISgzlu0HV6MoDNQ=
+			B6IwLF4spXc3MIWmjiGzYEUq6uw=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -22,10 +22,6 @@
 	<dict>
 		<key>QuickLook/Thumbnail.png</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			hC+U8EqvyIRM1lLakHLfvl4V9Tc=
-			</data>
 			<key>hash2</key>
 			<data>
 			nGfrvibB5KlzvZgF4Bra+l0HpRloxismgTLePnOwCdk=
@@ -33,23 +29,15 @@
 		</dict>
 		<key>Resources/English.lproj/InfoPlist.strings</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			XpQ+5Nexr0BmISgzlu0HV6MoDNQ=
-			</data>
 			<key>hash2</key>
 			<data>
-			3iVSofJUQvsJDQUTqS8Ar54l0WXFBcHHakefXyKPpY4=
+			G55KAfsIiP8n2CMqRqaLkdmGaYWBQWd9ABOs6wOilkc=
 			</data>
 			<key>optional</key>
 			<true/>
 		</dict>
 		<key>Resources/constants.xlf</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			Deeh4tnofJ4X8TTc7RmZ8E2Mw8A=
-			</data>
 			<key>hash2</key>
 			<data>
 			WFQPPLicPOtGAMXkFXL7elEHc26fejwcrfg3pVjlBYU=
@@ -57,10 +45,6 @@
 		</dict>
 		<key>Windows/Capture.4DX</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			M3e7MtXB9rxLyR66GQ0QAbmpUWA=
-			</data>
 			<key>hash2</key>
 			<data>
 			pWuwls3x63YlmDKhL5hiANX2+ngSb8vi3ulspr2py0o=
@@ -68,10 +52,6 @@
 		</dict>
 		<key>Windows64/Capture.4DX</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			mpoXxaiRCKn3GBNJVHJNwMGDat0=
-			</data>
 			<key>hash2</key>
 			<data>
 			pFkRzfBxkErWL2Ca2xbB79SbUhPhRUarFf0rJ8XwL0c=

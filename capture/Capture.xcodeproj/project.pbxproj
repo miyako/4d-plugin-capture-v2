@@ -18,6 +18,7 @@
 		D130064F12F02D9700702C0E /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D130064E12F02D9700702C0E /* Cocoa.framework */; };
 		D13116A91A03ACB700DE1322 /* 4DPluginAPI.c in Sources */ = {isa = PBXBuildFile; fileRef = D13116A81A03ACB700DE1322 /* 4DPluginAPI.c */; settings = {COMPILER_FLAGS = "-Wno-multichar"; }; };
 		D134D4AC1A030BA0008D14EF /* manifest.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = D134D4A91A030B06008D14EF /* manifest.json */; };
+		D1B2713D236047D50049FF26 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1B2713C236047D40049FF26 /* CoreMedia.framework */; };
 		D1FF000F234594CB00264690 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1FF000E234594CB00264690 /* AVFoundation.framework */; };
 		D1FF001123459EFC00264690 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D1FF001023459EFC00264690 /* Security.framework */; };
 		D1FF00142345A10D00264690 /* 4DPlugin-JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = D1FF00122345A10D00264690 /* 4DPlugin-JSON.h */; };
@@ -53,6 +54,7 @@
 		D13116A81A03ACB700DE1322 /* 4DPluginAPI.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = 4DPluginAPI.c; sourceTree = "<group>"; };
 		D134D4A91A030B06008D14EF /* manifest.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = manifest.json; sourceTree = "<group>"; };
 		D14D10DD1A03A8A5008B3411 /* constants.xlf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = constants.xlf; sourceTree = "<group>"; };
+		D1B2713C236047D40049FF26 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		D1FF000E234594CB00264690 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		D1FF001023459EFC00264690 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		D1FF00122345A10D00264690 /* 4DPlugin-JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "4DPlugin-JSON.h"; path = "support/4DPlugin-JSON.h"; sourceTree = "<group>"; };
@@ -65,6 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D1B2713D236047D50049FF26 /* CoreMedia.framework in Frameworks */,
 				D1FF00172345B70500264690 /* QuartzCore.framework in Frameworks */,
 				D1FF001123459EFC00264690 /* Security.framework in Frameworks */,
 				D1FF000F234594CB00264690 /* AVFoundation.framework in Frameworks */,
@@ -150,6 +153,7 @@
 		D16FBB3C22A4C07E008F0416 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D1B2713C236047D40049FF26 /* CoreMedia.framework */,
 				D1FF00162345B70500264690 /* QuartzCore.framework */,
 				D1FF001023459EFC00264690 /* Security.framework */,
 				D1FF000E234594CB00264690 /* AVFoundation.framework */,

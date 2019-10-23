@@ -1,0 +1,129 @@
+﻿{
+	"map": [
+		{
+			"id": 2147483647,
+			"path": "Sources/Methods/codesign.4dm"
+		},
+		{
+			"id": 2147483646,
+			"path": "Sources/Methods/hdiutil.4dm"
+		},
+		{
+			"id": 2147483645,
+			"path": "Sources/Methods/ditto.4dm"
+		},
+		{
+			"id": 2147483644,
+			"path": "Sources/Methods/xcode_get_path.4dm"
+		},
+		{
+			"id": 2147483643,
+			"path": "Sources/Methods/generate_file_from_template.4dm"
+		},
+		{
+			"id": 2147483642,
+			"path": "Sources/Methods/generate_project_infoplist.4dm"
+		},
+		{
+			"id": 2147483641,
+			"path": "Sources/Methods/generate_constants_xlf.4dm"
+		},
+		{
+			"id": 2147483640,
+			"path": "Sources/Methods/find_identity.4dm"
+		},
+		{
+			"id": 2147483639,
+			"path": "Sources/Methods/xcode_select.4dm"
+		},
+		{
+			"id": 2147483638,
+			"path": "Sources/Methods/install_name_tool.4dm"
+		},
+		{
+			"id": 2147483637,
+			"path": "Sources/Methods/xcode_SET_PATH.4dm"
+		},
+		{
+			"id": 2147483636,
+			"path": "Sources/Methods/generate_project_xcode.4dm"
+		},
+		{
+			"id": 2147483635,
+			"path": "Sources/Methods/pkgbuild.4dm"
+		},
+		{
+			"id": 2147483634,
+			"path": "Sources/Methods/TEST.4dm"
+		},
+		{
+			"id": 2147483633,
+			"path": "Sources/Methods/altool.4dm"
+		},
+		{
+			"id": 2147483632,
+			"path": "Sources/Methods/generate_project.4dm"
+		},
+		{
+			"id": 2147483631,
+			"path": "Sources/Methods/generate_project_vs.4dm"
+		},
+		{
+			"id": 2147483630,
+			"path": "Sources/Methods/error_xml.4dm"
+		},
+		{
+			"id": 2147483629,
+			"path": "Sources/Methods/generate_project_plugin_stub.4dm"
+		},
+		{
+			"id": 2147483628,
+			"path": "Sources/Methods/generate_project_source.4dm"
+		},
+		{
+			"id": 2147483627,
+			"path": "Sources/Methods/escape_param.4dm"
+		},
+		{
+			"id": 2147483626,
+			"path": "Sources/Forms/TEST/ObjectMethods/flipV.4dm"
+		},
+		{
+			"id": 2147483625,
+			"path": "Sources/Forms/TEST/ObjectMethods/flipH.4dm"
+		},
+		{
+			"id": 2147483624,
+			"path": "Sources/Forms/TEST/ObjectMethods/Snap.4dm"
+		},
+		{
+			"id": 2147483623,
+			"path": "Sources/Forms/TEST/ObjectMethods/Stop.4dm"
+		},
+		{
+			"id": 2147483622,
+			"path": "Sources/Forms/TEST/ObjectMethods/Start.4dm"
+		},
+		{
+			"id": 2147483621,
+			"path": "Sources/Forms/TEST/ObjectMethods/Start recording.4dm"
+		},
+		{
+			"id": 2147483620,
+			"path": "Sources/Forms/TEST/ObjectMethods/Stop recording.4dm"
+		},
+		{
+			"id": 2147483619,
+			"path": "Sources/Forms/TEST/ObjectMethods/Pause recording.4dm"
+		},
+		{
+			"id": 2147483618,
+			"path": "Sources/Forms/TEST/ObjectMethods/Resume recording.4dm"
+		},
+		{
+			"id": 2147483617,
+			"path": "Sources/Forms/TEST/method.4dm"
+		}
+	],
+	"arch64": true
+}

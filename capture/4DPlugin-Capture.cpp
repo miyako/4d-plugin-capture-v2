@@ -54,6 +54,134 @@ void addSublayer(addSublayerCtx *ctx) {
 	}
 }
 
+#pragma mark -
+
+-(void)setMaxRecordedDuration:(int64_t)maxRecordedDuration
+{
+    if (isConfigured) {
+     
+        [fileOutput setMaxRecordedDuration:CMTimeMakeWithSeconds(maxRecordedDuration, 1)];
+        
+    }
+}
+
+-(void)setMaxRecordedFileSize:(int64_t)maxRecordedFileSize
+{
+    if (isConfigured) {
+        
+        [fileOutput setMaxRecordedFileSize:maxRecordedFileSize];
+        
+    }
+}
+
+-(void)setVideoQuality:(double)videoQuality
+{
+    if (isConfigured) {
+
+        NSDictionary *outputSettings = [NSDictionary
+                                        dictionaryWithObject:[NSDictionary
+                                                              dictionaryWithObject:[NSNumber numberWithDouble:videoQuality]
+                                                              forKey:AVVideoQualityKey]
+                                        forKey:AVVideoCompressionPropertiesKey];
+
+        AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
+        [fileOutput setOutputSettings:outputSettings forConnection:connection];
+    }
+}
+
+-(void)setMaxKeyFrameIntervalDuration:(double)intervalDuration
+{
+    if (isConfigured) {
+        
+        NSDictionary *outputSettings = [NSDictionary
+                                        dictionaryWithObject:[NSDictionary
+                                                              dictionaryWithObject:[NSNumber numberWithDouble:intervalDuration]
+                                                              forKey:AVVideoMaxKeyFrameIntervalDurationKey]
+                                        forKey:AVVideoCompressionPropertiesKey];
+        
+        AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
+        [fileOutput setOutputSettings:outputSettings forConnection:connection];
+    }
+}
+
+-(void)setMaxKeyFrameInterval:(NSUInteger)keyFrameInterval
+{
+    if (isConfigured) {
+        
+        NSDictionary *outputSettings = [NSDictionary
+                                        dictionaryWithObject:[NSDictionary
+                                                              dictionaryWithObject:[NSNumber numberWithUnsignedInteger:keyFrameInterval]
+                                                              forKey:AVVideoMaxKeyFrameIntervalKey]
+                                        forKey:AVVideoCompressionPropertiesKey];
+        
+        AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
+        [fileOutput setOutputSettings:outputSettings forConnection:connection];
+    }
+}
+
+-(void)setAverageBitRate:(NSUInteger)averageBitRate
+{
+    if (isConfigured) {
+        
+        NSDictionary *outputSettings = [NSDictionary
+                                        dictionaryWithObject:[NSDictionary
+                                                              dictionaryWithObject:[NSNumber numberWithUnsignedInteger:averageBitRate]
+                                                              forKey:AVVideoAverageBitRateKey]
+                                        forKey:AVVideoCompressionPropertiesKey];
+        
+        AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
+        [fileOutput setOutputSettings:outputSettings forConnection:connection];
+    }
+}
+
+-(void)setVideoCodec:(AVVideoCodecType)videoCodec
+{
+    if (isConfigured) {
+        
+        NSDictionary *outputSettings = [NSDictionary dictionaryWithObject:videoCodec forKey:AVVideoCodecKey];
+        
+        AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
+        [fileOutput setOutputSettings:outputSettings forConnection:connection];
+    }
+}
+
+-(void)setVideoHeight:(NSUInteger)height
+{
+    if (isConfigured) {
+        
+        NSDictionary *outputSettings = [NSDictionary
+                                        dictionaryWithObject:[NSNumber numberWithUnsignedInteger:height]
+                                        forKey:AVVideoHeightKey];
+        
+        AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
+        [fileOutput setOutputSettings:outputSettings forConnection:connection];
+    }
+}
+
+-(void)setVideoWidth:(NSUInteger)width
+{
+    if (isConfigured) {
+        
+        NSDictionary *outputSettings = [NSDictionary
+                                        dictionaryWithObject:[NSNumber numberWithUnsignedInteger:width]
+                                        forKey:AVVideoWidthKey];
+        
+        AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
+        [fileOutput setOutputSettings:outputSettings forConnection:connection];
+    }
+}
+
+-(void)setSessionPreset:(AVCaptureSessionPreset)sessionPreset
+{
+    if (isConfigured) {
+        if([captureSession canSetSessionPreset:sessionPreset]) {
+            
+            captureSession.sessionPreset = sessionPreset;
+            
+        }
+    }
+}
+
 -(void)setPreviewLayerView:(NSView *)view frame : (NSRect)frame flipH : (bool)flipH flipV : (bool)flipV
 {
 	if (isConfigured) {
@@ -649,6 +777,23 @@ void capture_Start_recording(PA_PluginParameters params) {
             ob_get_s(param, L"file", &path);
             NSString *str = [[NSString alloc]initWithUTF8String:(const char *)path.c_str()];
             
+            CMTime maxRecordedDuration = kCMTimeInvalid;
+            if(ob_is_defined(param, L"maxRecordedDuration")) {
+                maxRecordedDuration = CMTimeMakeWithSeconds(ob_get_n(param, L"maxRecordedDuration"), 1);
+            }
+            
+            int64_t maxRecordedFileSize = 0;
+            if(ob_is_defined(param, L"maxRecordedFileSize")) {
+                maxRecordedFileSize = ob_get_n(param, L"maxRecordedFileSize");
+            }
+            
+            
+            
+            
+            
+
+            
+            
             if(str) {
                 NSURL *url = (NSURL *)CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (CFStringRef)str, kCFURLHFSPathStyle, false);
                 [captureMan performSelectorInBackground:@selector(startRecording:) withObject:url];
@@ -750,6 +895,107 @@ void capture_Start(PA_PluginParameters params) {
                 rect.size.height = height;
                 
                 [captureMan setPreviewLayerView:contentView frame:rect flipH:flipH flipV:flipV];
+                
+                CUTF8String codec;
+                AVVideoCodecType videoCodec = nil;
+                
+                if(ob_get_s(param, L"videoCodec", &codec)) {
+                    
+                    if(codec == (const uint8_t *)"JPEG") {
+                        videoCodec = AVVideoCodecTypeJPEG;
+                    }
+                    if(codec == (const uint8_t *)"H264") {
+                        videoCodec = AVVideoCodecTypeH264;
+                    }
+                    if(codec == (const uint8_t *)"HEVC") {
+                        videoCodec = AVVideoCodecTypeHEVC;
+                    }
+                    if(codec == (const uint8_t *)"AppleProRes422") {
+                        videoCodec = AVVideoCodecTypeAppleProRes422;
+                    }
+                    if(codec == (const uint8_t *)"AppleProRes4444") {
+                        videoCodec = AVVideoCodecTypeAppleProRes4444;
+                    }
+                    
+                }
+                
+                if(videoCodec) {
+                    [captureMan setVideoCodec:videoCodec];
+                }
+                
+                CUTF8String preset;
+                AVCaptureSessionPreset sessionPreset = AVCaptureSessionPresetHigh;
+                
+                if(ob_get_s(param, L"preset", &preset)) {
+                    
+                    if(preset == (const uint8_t *)"low") {
+                        sessionPreset = AVCaptureSessionPresetLow;
+                    }
+                    if(preset == (const uint8_t *)"medium") {
+                        sessionPreset = AVCaptureSessionPresetMedium;
+                    }
+                    if(preset == (const uint8_t *)"high") {
+                        sessionPreset = AVCaptureSessionPresetHigh;
+                    }
+                    if(preset == (const uint8_t *)"960x540") {
+                        sessionPreset = AVCaptureSessionPreset960x540;
+                    }
+                    if(preset == (const uint8_t *)"1280x720") {
+                        sessionPreset = AVCaptureSessionPreset1280x720;
+                    }
+                    if(preset == (const uint8_t *)"i960x540") {
+                        sessionPreset = AVCaptureSessionPresetiFrame960x540;
+                    }
+                    if(preset == (const uint8_t *)"i1280x720") {
+                        sessionPreset = AVCaptureSessionPresetiFrame1280x720;
+                    }
+                    if(preset == (const uint8_t *)"320x240") {
+                        sessionPreset = AVCaptureSessionPreset320x240;
+                    }
+                    if(preset == (const uint8_t *)"640x480") {
+                        sessionPreset = AVCaptureSessionPreset640x480;
+                    }
+                    if(preset == (const uint8_t *)"352x288") {
+                        sessionPreset = AVCaptureSessionPreset352x288;
+                    }
+                    
+                }
+                
+                if(sessionPreset != AVCaptureSessionPresetHigh) {
+                    [captureMan setSessionPreset:sessionPreset];
+                }
+                
+                if(ob_is_defined(param, L"quality")) {
+                    [captureMan setVideoQuality:ob_get_n(param, L"quality")];
+                }
+                
+                if(ob_is_defined(param, L"averageBitRate")) {
+                    [captureMan setAverageBitRate:ob_get_n(param, L"averageBitRate")];
+                }
+                
+                if(ob_is_defined(param, L"maxKeyFrameInterval")) {
+                    [captureMan setMaxKeyFrameInterval:ob_get_n(param, L"maxKeyFrameInterval")];
+                }
+                
+                if(ob_is_defined(param, L"maxKeyFrameIntervalDuration")) {
+                    [captureMan setMaxKeyFrameIntervalDuration:ob_get_n(param, L"maxKeyFrameIntervalDuration")];
+                }
+                
+                if(ob_is_defined(param, L"videoWidth")) {
+                    [captureMan setVideoWidth:ob_get_n(param, L"videoWidth")];
+                }
+
+                if(ob_is_defined(param, L"videoHeight")) {
+                    [captureMan setVideoHeight:ob_get_n(param, L"videoHeight")];
+                }
+                
+                if(ob_is_defined(param, L"maxRecordedDuration")) {
+                    [captureMan setMaxRecordedDuration:ob_get_n(param, L"maxRecordedDuration")];
+                }
+                
+                if(ob_is_defined(param, L"maxRecordedFileSize")) {
+                    [captureMan setMaxRecordedFileSize:ob_get_n(param, L"maxRecordedFileSize")];
+                }
                 
                 [captureMan performSelectorInBackground:@selector(startRunning) withObject:nil];
                 

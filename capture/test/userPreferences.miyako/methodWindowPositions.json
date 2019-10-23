@@ -296,12 +296,18 @@
 	"Sources/Forms/TEST/method.4dm": {
 		"left": 477,
 		"top": 234,
-		"width": 380,
-		"height": 415
+		"width": 724,
+		"height": 620
 	},
 	"Sources/Methods/pkgbuild.4dm": {
 		"left": 747,
 		"top": 548,
+		"width": 778,
+		"height": 488
+	},
+	"Sources/Forms/TEST/ObjectMethods/Form.4dm": {
+		"left": 451,
+		"top": 232,
 		"width": 778,
 		"height": 488
 	}

@@ -134,6 +134,7 @@ public:
 #import <AVFoundation/AVFoundation.h>
 #import <Security/Security.h>
 #import <CoreFoundation/CoreFoundation.h>
+#import <CoreMedia/CoreMedia.h>
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/CALayer.h>
 

@@ -36,6 +36,11 @@ Case of
 		
 		capture Start (Form:C1466)
 		
+		If (Is macOS:C1572)
+			  //touch for core animation
+			REDRAW WINDOW:C456(Current form window:C827)
+		End if 
+		
 	: ($event=On Load:K2:1)
 		
 		Form:C1466.flipH:=True:C214

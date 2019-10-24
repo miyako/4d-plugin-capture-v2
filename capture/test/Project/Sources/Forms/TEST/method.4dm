@@ -46,7 +46,7 @@ Case of
 		Form:C1466.flipH:=True:C214
 		Form:C1466.flipV:=False:C215
 		Form:C1466.window:=Current form window:C827
-		Form:C1466.status:=capture Request permisson 
+		Form:C1466.status:=capture Request permission 
 		
 		OBJECT GET COORDINATES:C663(*;"Frame";$left;$top;$right;$bottom)
 		

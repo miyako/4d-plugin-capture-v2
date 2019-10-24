@@ -20,23 +20,6 @@
 	"pages": [
 		{
 			"objects": {
-				"image": {
-					"type": "input",
-					"left": 0,
-					"top": 0,
-					"width": 640,
-					"height": 320,
-					"dataSourceTypeHint": "picture",
-					"dataSource": "Form:C1466.image",
-					"enterable": false,
-					"focusable": false,
-					"contextMenu": "none",
-					"borderStyle": "none",
-					"fill": "transparent",
-					"pictureFormat": "proportionalTopLeft",
-					"dragging": "none",
-					"dropping": "none"
-				},
 				"Form": {
 					"type": "input",
 					"left": 0,
@@ -52,6 +35,24 @@
 					"stroke": "#fffacd",
 					"focusable": false,
 					"contextMenu": "none",
+					"dragging": "none",
+					"dropping": "none",
+					"visibility": "hidden"
+				},
+				"image": {
+					"type": "input",
+					"left": 0,
+					"top": 0,
+					"width": 640,
+					"height": 320,
+					"dataSourceTypeHint": "picture",
+					"dataSource": "Form:C1466.image",
+					"enterable": false,
+					"focusable": false,
+					"contextMenu": "none",
+					"borderStyle": "none",
+					"fill": "transparent",
+					"pictureFormat": "proportionalTopLeft",
 					"dragging": "none",
 					"dropping": "none"
 				}
@@ -101,18 +102,6 @@
 					],
 					"method": "ObjectMethods/Snap.4dm",
 					"focusable": false
-				},
-				"Frame": {
-					"type": "rectangle",
-					"top": 298,
-					"left": 373,
-					"width": 372,
-					"height": 232,
-					"fill": "transparent",
-					"stroke": "#dc143c",
-					"sizingX": "grow",
-					"sizingY": "grow",
-					"strokeWidth": 4
 				},
 				"Stop": {
 					"type": "button",
@@ -191,6 +180,19 @@
 					],
 					"method": "ObjectMethods/Resume recording.4dm",
 					"focusable": false
+				},
+				"Frame": {
+					"type": "rectangle",
+					"top": 298,
+					"left": 373,
+					"width": 372,
+					"height": 232,
+					"fill": "transparent",
+					"stroke": "#dc143c",
+					"sizingX": "grow",
+					"sizingY": "grow",
+					"strokeWidth": 4,
+					"visibility": "hidden"
 				}
 			}
 		}

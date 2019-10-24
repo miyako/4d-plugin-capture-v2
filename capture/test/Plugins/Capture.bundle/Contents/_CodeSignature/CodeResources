@@ -8,7 +8,7 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			B6IwLF4spXc3MIWmjiGzYEUq6uw=
+			IUIS3Pjb1lp0OMTd0u5A0erbD1s=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -31,7 +31,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			G55KAfsIiP8n2CMqRqaLkdmGaYWBQWd9ABOs6wOilkc=
+			yhm+Qvo8bcQxBbkPZ9nO39NbivTNlsmp1DrOB0y9K8Q=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -61,7 +61,7 @@
 		<dict>
 			<key>cdhash</key>
 			<data>
-			g64rjqwF1VZqzHfELFiJczNz7IE=
+			017PMqDVGPD0+mjyorfqbBxzF80=
 			</data>
 			<key>requirement</key>
 			<string>identifier manifest and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = Y69CWUC25B</string>

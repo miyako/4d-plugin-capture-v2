@@ -387,21 +387,17 @@
 		"stamp": "2019-10-14T16:02:26.848Z"
 	},
 	"Sources/Forms/TEST/method.4dm": {
-		"startSelection": 28,
-		"endSelection": 28,
-		"firstSelectedLine": 15,
-		"lastSelectedLine": 15,
+		"startSelection": 40,
+		"endSelection": 40,
+		"firstSelectedLine": 24,
+		"lastSelectedLine": 24,
 		"folding": [
 			3,
 			7,
-			17,
-			43,
-			52,
-			63,
-			78
+			17
 		],
 		"bookmarks": [],
-		"stamp": "2019-10-23T09:02:03.101Z"
+		"stamp": "2019-10-24T00:49:35.413Z"
 	},
 	"Sources/Methods/pkgbuild.4dm": {
 		"startSelection": 11,

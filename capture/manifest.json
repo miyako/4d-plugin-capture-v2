@@ -4,7 +4,7 @@
     "commands": [
         {
             "theme": "capture",
-            "syntax": "capture Request permisson:J",
+            "syntax": "capture Request permission:J",
             "threadSafe": true
         },
         {

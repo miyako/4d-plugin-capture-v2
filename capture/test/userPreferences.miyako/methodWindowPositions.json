@@ -294,8 +294,8 @@
 		"height": 741
 	},
 	"Sources/Forms/TEST/method.4dm": {
-		"left": 725,
-		"top": 142,
+		"left": 437,
+		"top": 185,
 		"width": 724,
 		"height": 620
 	},
@@ -310,5 +310,11 @@
 		"top": 232,
 		"width": 778,
 		"height": 488
+	},
+	"Sources/Methods/Method22.4dm": {
+		"left": 541,
+		"top": 753,
+		"width": 1024,
+		"height": 705
 	}
 }

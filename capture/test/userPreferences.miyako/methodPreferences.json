@@ -387,17 +387,15 @@
 		"stamp": "2019-10-14T16:02:26.848Z"
 	},
 	"Sources/Forms/TEST/method.4dm": {
-		"startSelection": 40,
-		"endSelection": 40,
-		"firstSelectedLine": 24,
-		"lastSelectedLine": 24,
+		"startSelection": 0,
+		"endSelection": 0,
+		"firstSelectedLine": 27,
+		"lastSelectedLine": 27,
 		"folding": [
-			3,
-			7,
-			17
+			3
 		],
 		"bookmarks": [],
-		"stamp": "2019-10-24T00:49:35.413Z"
+		"stamp": "2019-11-22T05:55:46.194Z"
 	},
 	"Sources/Methods/pkgbuild.4dm": {
 		"startSelection": 11,
@@ -416,5 +414,14 @@
 		"folding": [],
 		"bookmarks": [],
 		"stamp": "2019-10-23T09:01:06.419Z"
+	},
+	"Sources/Methods/Method22.4dm": {
+		"startSelection": 25,
+		"endSelection": 0,
+		"firstSelectedLine": 0,
+		"lastSelectedLine": 0,
+		"folding": [],
+		"bookmarks": [],
+		"stamp": "2019-11-22T05:54:53.105Z"
 	}
 }

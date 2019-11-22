@@ -321,93 +321,96 @@ void addSublayer(addSublayerCtx *ctx) {
 		videoDevice = [AVCaptureDevice deviceWithUniqueID : deviceUniqueID];
 	}
 
-	videoInput = [AVCaptureDeviceInput deviceInputWithDevice : videoDevice error : &error];
+    if(videoDevice) {
+        
+        videoInput = [AVCaptureDeviceInput deviceInputWithDevice : videoDevice error : &error];
 
-	if (videoInput) {
-		if ([captureSession canAddInput : videoInput]) {
-			[captureSession addInput : videoInput];
-			videoOutput = [[AVCaptureVideoDataOutput alloc]init];
-			if (videoOutput) {
-				if ([captureSession canAddOutput : videoOutput]) {
-					[captureSession addOutput : videoOutput];
+        if (videoInput) {
+            if ([captureSession canAddInput : videoInput]) {
+                [captureSession addInput : videoInput];
+                videoOutput = [[AVCaptureVideoDataOutput alloc]init];
+                if (videoOutput) {
+                    if ([captureSession canAddOutput : videoOutput]) {
+                        [captureSession addOutput : videoOutput];
 
-					imageOutput = [[AVCaptureStillImageOutput alloc]init];
-					if (imageOutput) {
+                        imageOutput = [[AVCaptureStillImageOutput alloc]init];
+                        if (imageOutput) {
 
-						if ([captureSession canAddOutput : imageOutput])
-						{
-							[captureSession addOutput : imageOutput];
+                            if ([captureSession canAddOutput : imageOutput])
+                            {
+                                [captureSession addOutput : imageOutput];
 
-							fileOutput = [[AVCaptureMovieFileOutput alloc]init];
-							if (fileOutput) {
-								if ([captureSession canAddOutput : fileOutput])
-									[captureSession addOutput : fileOutput];
+                                fileOutput = [[AVCaptureMovieFileOutput alloc]init];
+                                if (fileOutput) {
+                                    if ([captureSession canAddOutput : fileOutput])
+                                        [captureSession addOutput : fileOutput];
 
-								previewLayer = [[AVCaptureVideoPreviewLayer alloc]init];
+                                    previewLayer = [[AVCaptureVideoPreviewLayer alloc]init];
 
-								/* no combination to emulate 4D resizing (y is pinned to the bottom, not top) */
-								//                            previewLayer.autoresizingMask = kCALayerWidthSizable|kCALayerHeightSizable;
-								[previewLayer setSession : captureSession];
+                                    /* no combination to emulate 4D resizing (y is pinned to the bottom, not top) */
+                                    //                            previewLayer.autoresizingMask = kCALayerWidthSizable|kCALayerHeightSizable;
+                                    [previewLayer setSession : captureSession];
 
-								superLayerView = nil;
+                                    superLayerView = nil;
 
-								imageCaptured = false;
-								isConfigured = true;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+                                    imageCaptured = false;
+                                    isConfigured = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-	[captureSession commitConfiguration];
+        [captureSession commitConfiguration];
 
-	notificationCenter = [NSNotificationCenter defaultCenter];
+        notificationCenter = [NSNotificationCenter defaultCenter];
 
-	if (@available(macOS 10.14, *)) {
-	[notificationCenter
-		addObserver : self
-		selector : @selector(onInterrupted : )
-				   name:AVCaptureSessionWasInterruptedNotification
-		object : nil];
+        if (@available(macOS 10.14, *)) {
+        [notificationCenter
+            addObserver : self
+            selector : @selector(onInterrupted : )
+                       name:AVCaptureSessionWasInterruptedNotification
+            object : nil];
 
-	[notificationCenter
-		addObserver : self
-		selector : @selector(onSessionInterruptionEnded : )
-				   name:AVCaptureSessionInterruptionEndedNotification
-		object : nil];
-	}
+        [notificationCenter
+            addObserver : self
+            selector : @selector(onSessionInterruptionEnded : )
+                       name:AVCaptureSessionInterruptionEndedNotification
+            object : nil];
+        }
 
-	[notificationCenter
-		addObserver : self
-		selector : @selector(onSessionRuntimeError : )
-				   name:AVCaptureSessionRuntimeErrorNotification
-		object : nil];
+        [notificationCenter
+            addObserver : self
+            selector : @selector(onSessionRuntimeError : )
+                       name:AVCaptureSessionRuntimeErrorNotification
+            object : nil];
 
-	[notificationCenter
-		addObserver : self
-		selector : @selector(onStartRunning : )
-				   name:AVCaptureSessionDidStartRunningNotification
-		object : nil];
+        [notificationCenter
+            addObserver : self
+            selector : @selector(onStartRunning : )
+                       name:AVCaptureSessionDidStartRunningNotification
+            object : nil];
 
-	[notificationCenter
-		addObserver : self
-		selector : @selector(onStopRunning : )
-				   name:AVCaptureSessionDidStopRunningNotification
-		object : nil];
+        [notificationCenter
+            addObserver : self
+            selector : @selector(onStopRunning : )
+                       name:AVCaptureSessionDidStopRunningNotification
+            object : nil];
 
-	[notificationCenter
-		addObserver : self
-		selector : @selector(onDeviceConnected : )
-				   name:AVCaptureDeviceWasConnectedNotification
-		object : nil];
+        [notificationCenter
+            addObserver : self
+            selector : @selector(onDeviceConnected : )
+                       name:AVCaptureDeviceWasConnectedNotification
+            object : nil];
 
-	[notificationCenter
-		addObserver : self
-		selector : @selector(onDeviceDisconnected : )
-				   name:AVCaptureDeviceWasDisconnectedNotification
-		object : nil];
+        [notificationCenter
+            addObserver : self
+            selector : @selector(onDeviceDisconnected : )
+                       name:AVCaptureDeviceWasDisconnectedNotification
+            object : nil];
+    }
 
 	return self;
 }

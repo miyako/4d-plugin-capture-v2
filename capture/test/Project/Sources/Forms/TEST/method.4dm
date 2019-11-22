@@ -48,6 +48,8 @@ Case of
 		Form:C1466.window:=Current form window:C827
 		Form:C1466.status:=capture Request permission 
 		
+		Form:C1466.device:=""
+		
 		OBJECT GET COORDINATES:C663(*;"Frame";$left;$top;$right;$bottom)
 		
 		If (Is macOS:C1572)

@@ -1,23 +1,6 @@
 ﻿{
 	"editors": [
 		{
-			"type": "method",
-			"id": 2147483617,
-			"codeDescriptor": {
-				"type": 3,
-				"formName": "TEST",
-				"methodPath": "/SOURCES/Forms/TEST/method.4dm"
-			}
-		},
-		{
-			"type": "method",
-			"id": 2147483616,
-			"codeDescriptor": {
-				"type": 1,
-				"methodName": "Method22"
-			}
-		},
-		{
 			"type": "form",
 			"id": 1,
 			"formName": "TEST"

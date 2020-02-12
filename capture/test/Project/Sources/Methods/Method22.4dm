@@ -1,2 +1,0 @@
-//%attributes = {}
-$devices:=capture Devices 

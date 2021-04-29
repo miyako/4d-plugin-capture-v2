@@ -1,29 +1,29 @@
 ﻿{
 	"export_project": {
 		"methods": [
-			"generate_project_source",
-			"generate_project_plugin_stub",
-			"generate_project_vs",
-			"generate_project",
-			"generate_project_xcode",
 			"generate_constants_xlf",
+			"generate_file_from_template",
+			"generate_project",
 			"generate_project_infoplist",
-			"generate_file_from_template"
+			"generate_project_plugin_stub",
+			"generate_project_source",
+			"generate_project_vs",
+			"generate_project_xcode"
 		]
 	},
 	"sign_app": {
 		"methods": [
-			"escape_param",
-			"error_xml",
 			"altool",
-			"xcode_SET_PATH",
-			"install_name_tool",
-			"xcode_select",
-			"find_identity",
-			"xcode_get_path",
+			"codesign",
 			"ditto",
+			"error_xml",
+			"escape_param",
+			"find_identity",
 			"hdiutil",
-			"codesign"
+			"install_name_tool",
+			"xcode_get_path",
+			"xcode_select",
+			"xcode_SET_PATH"
 		]
 	},
 	"trash": {}

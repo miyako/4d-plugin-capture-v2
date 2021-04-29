@@ -8,7 +8,7 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			zMR2UGFBzrjCH9in281RuoylTGc=
+			XNWADN3JpngGTeFiZmRQpXv9A4A=
 			</data>
 			<key>optional</key>
 			<true/>
@@ -17,15 +17,15 @@
 		<data>
 		Deeh4tnofJ4X8TTc7RmZ8E2Mw8A=
 		</data>
+		<key>Resources/manifest.json</key>
+		<data>
+		Drrk2k+weLbcepVjngChgY4vK5A=
+		</data>
 	</dict>
 	<key>files2</key>
 	<dict>
 		<key>QuickLook/Thumbnail.png</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			hC+U8EqvyIRM1lLakHLfvl4V9Tc=
-			</data>
 			<key>hash2</key>
 			<data>
 			nGfrvibB5KlzvZgF4Bra+l0HpRloxismgTLePnOwCdk=
@@ -33,58 +33,33 @@
 		</dict>
 		<key>Resources/English.lproj/InfoPlist.strings</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			zMR2UGFBzrjCH9in281RuoylTGc=
-			</data>
 			<key>hash2</key>
 			<data>
-			kXIgG4H8pUZ6dDuBLMuhL11EkPlymN+F/zFmKSttv50=
+			g9vw98PLa3+HfBQ5ODK0i8C/83AtYVvG+GMnOnDRfBE=
 			</data>
 			<key>optional</key>
 			<true/>
 		</dict>
 		<key>Resources/constants.xlf</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			Deeh4tnofJ4X8TTc7RmZ8E2Mw8A=
-			</data>
 			<key>hash2</key>
 			<data>
 			WFQPPLicPOtGAMXkFXL7elEHc26fejwcrfg3pVjlBYU=
 			</data>
 		</dict>
-		<key>Windows/Capture.4DX</key>
+		<key>Resources/manifest.json</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			M3e7MtXB9rxLyR66GQ0QAbmpUWA=
-			</data>
 			<key>hash2</key>
 			<data>
-			pWuwls3x63YlmDKhL5hiANX2+ngSb8vi3ulspr2py0o=
+			+BY3gtanMWcp2UCNiZq0G0iGvPjslsebK2mCSQr6Yks=
 			</data>
 		</dict>
 		<key>Windows64/Capture.4DX</key>
 		<dict>
-			<key>hash</key>
-			<data>
-			mpoXxaiRCKn3GBNJVHJNwMGDat0=
-			</data>
 			<key>hash2</key>
 			<data>
 			pFkRzfBxkErWL2Ca2xbB79SbUhPhRUarFf0rJ8XwL0c=
 			</data>
-		</dict>
-		<key>manifest.json</key>
-		<dict>
-			<key>cdhash</key>
-			<data>
-			017PMqDVGPD0+mjyorfqbBxzF80=
-			</data>
-			<key>requirement</key>
-			<string>identifier manifest and anchor apple generic and certificate 1[field.1.2.840.113635.100.6.2.6] /* exists */ and certificate leaf[field.1.2.840.113635.100.6.1.13] /* exists */ and certificate leaf[subject.OU] = Y69CWUC25B</string>
 		</dict>
 	</dict>
 	<key>rules</key>

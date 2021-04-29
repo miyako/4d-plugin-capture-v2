@@ -432,7 +432,7 @@ void addSublayer(addSublayerCtx *ctx) {
 
 -(void)onStartRunning : (NSNotification *)notification
 {
-    /* none these work convincingly; use redraw window inside 4D */
+    /* none of these work convincingly; use redraw window inside 4D */
     
 //    [[superLayerView window] display];
     [superLayerView updateLayer];

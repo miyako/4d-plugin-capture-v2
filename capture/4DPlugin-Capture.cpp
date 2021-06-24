@@ -292,8 +292,8 @@ void addSublayer(addSublayerCtx *ctx) {
 {
 	bool returnValue = false;
 
-	if ((uniqueID) && (_deviceUniqueID)) {
-        returnValue = [[NSString stringWithUTF8String:uniqueID]isEqualToString:_deviceUniqueID];
+	if ((uniqueID) && (self.deviceUniqueID)) {
+        returnValue = [[NSString stringWithUTF8String:uniqueID]isEqualToString:self.deviceUniqueID];
 	}
 
 	return returnValue;
@@ -304,9 +304,7 @@ void addSublayer(addSublayerCtx *ctx) {
 	if (!(self = [super init])) return self;
 
 	NSError *error = nil;
-    
-    _deviceUniqueID = nil;
-    
+        
 	captureSession = [[AVCaptureSession alloc]init];
 
 	[captureSession beginConfiguration];
@@ -314,12 +312,12 @@ void addSublayer(addSublayerCtx *ctx) {
 	if (!uniqueID) {
 
 		videoDevice = [AVCaptureDevice defaultDeviceWithMediaType : AVMediaTypeVideo];
-		_deviceUniqueID = [videoDevice uniqueID];
+        self.deviceUniqueID = [videoDevice uniqueID];
 
 	}
 	else {
-		_deviceUniqueID = [NSString stringWithUTF8String : uniqueID];
-		videoDevice = [AVCaptureDevice deviceWithUniqueID : _deviceUniqueID];
+        self.deviceUniqueID = [NSString stringWithUTF8String : uniqueID];
+		videoDevice = [AVCaptureDevice deviceWithUniqueID : self.deviceUniqueID];
 	}
 
     if(videoDevice) {

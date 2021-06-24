@@ -176,7 +176,7 @@ typedef enum {
     NSNotificationCenter *notificationCenter;
 }
 
-@property (copy) NSString *deviceUniqueID;
+@property (nonatomic, copy) NSString *deviceUniqueID;
 
 - (id)initWithUniqueID:(const char *)uniqueID;
 

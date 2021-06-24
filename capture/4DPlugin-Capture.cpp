@@ -292,9 +292,8 @@ void addSublayer(addSublayerCtx *ctx) {
 {
 	bool returnValue = false;
 
-	if ((uniqueID) && (deviceUniqueID)) {
-
-		returnValue = [[NSString stringWithUTF8String : uniqueID]isEqualToString:deviceUniqueID];
+	if ((uniqueID) && (_deviceUniqueID)) {
+        returnValue = [[NSString stringWithUTF8String:uniqueID]isEqualToString:_deviceUniqueID];
 	}
 
 	return returnValue;
@@ -305,7 +304,9 @@ void addSublayer(addSublayerCtx *ctx) {
 	if (!(self = [super init])) return self;
 
 	NSError *error = nil;
-
+    
+    _deviceUniqueID = nil;
+    
 	captureSession = [[AVCaptureSession alloc]init];
 
 	[captureSession beginConfiguration];
@@ -313,12 +314,12 @@ void addSublayer(addSublayerCtx *ctx) {
 	if (!uniqueID) {
 
 		videoDevice = [AVCaptureDevice defaultDeviceWithMediaType : AVMediaTypeVideo];
-		deviceUniqueID = [videoDevice uniqueID];
+		_deviceUniqueID = [videoDevice uniqueID];
 
 	}
 	else {
-		deviceUniqueID = [NSString stringWithUTF8String : uniqueID];
-		videoDevice = [AVCaptureDevice deviceWithUniqueID : deviceUniqueID];
+		_deviceUniqueID = [NSString stringWithUTF8String : uniqueID];
+		videoDevice = [AVCaptureDevice deviceWithUniqueID : _deviceUniqueID];
 	}
 
     if(videoDevice) {
@@ -863,7 +864,7 @@ void capture_Start(PA_PluginParameters params) {
             
             bool force = ob_get_b(param, L"force");
             
-            const char *uniqueID = NULL;
+            std::string uniqueID;
             CUTF8String _uniqueID;
             
             if(ob_get_s(param, L"device", &_uniqueID)) {
@@ -877,17 +878,17 @@ void capture_Start(PA_PluginParameters params) {
                 if(!captureMan)
                 {
 
-                    captureMan = [[CaptureMan alloc]initWithUniqueID:uniqueID];
+                    captureMan = [[CaptureMan alloc]initWithUniqueID:uniqueID.c_str()];
                     force = false;/* captureMan is not instantiated yet */
                     
-                }else if((uniqueID) && (![captureMan isDeviceUniqueID:uniqueID])) {
+                }else if((uniqueID.length()) && (![captureMan isDeviceUniqueID:uniqueID.c_str()])) {
                     force = true;/* uniqueID changed; force */
                 }/* on mac we can chenge window without force */
 
                 if(force) {
                     
                     [captureMan release];
-                    captureMan = [[CaptureMan alloc]initWithUniqueID:uniqueID];
+                    captureMan = [[CaptureMan alloc]initWithUniqueID:uniqueID.c_str()];
                     
                 }
                 

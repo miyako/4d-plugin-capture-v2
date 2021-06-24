@@ -162,8 +162,7 @@ typedef enum {
     AVCaptureVideoDataOutput *videoOutput;
     AVCaptureVideoPreviewLayer *previewLayer;
     AVCaptureMovieFileOutput *fileOutput;
-    NSString *deviceUniqueID;
-    
+        
     CGRect previewLayerFrame;
     NSView *superLayerView;
     
@@ -176,6 +175,8 @@ typedef enum {
     
     NSNotificationCenter *notificationCenter;
 }
+
+@property (copy) NSString *deviceUniqueID;
 
 - (id)initWithUniqueID:(const char *)uniqueID;
 

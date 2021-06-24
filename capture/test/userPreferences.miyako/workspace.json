@@ -2,8 +2,11 @@
 	"editors": [
 		{
 			"type": "form",
-			"id": 218,
+			"id": 1,
 			"formName": "TEST"
+		},
+		{
+			"type": "structure"
 		},
 		{
 			"type": "explorer"

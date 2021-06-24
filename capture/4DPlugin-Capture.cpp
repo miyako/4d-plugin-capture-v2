@@ -292,7 +292,7 @@ void addSublayer(addSublayerCtx *ctx) {
 {
 	bool returnValue = false;
 
-	if (uniqueID) {
+	if ((uniqueID) && (deviceUniqueID)) {
 
 		returnValue = [[NSString stringWithUTF8String : uniqueID]isEqualToString:deviceUniqueID];
 	}

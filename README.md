@@ -3,7 +3,7 @@
 [![license](https://img.shields.io/github/license/miyako/4d-plugin-capture-v2)](LICENSE)
 ![downloads](https://img.shields.io/github/downloads/miyako/4d-plugin-capture-v2/total)
 
-See [4d-utility-sign-app](https://github.com/miyako/4d-utility-sign-app) on how to enable the plugin in 4D.
+See ~~[4d-utility-sign-app](https://github.com/miyako/4d-utility-sign-app)~~ [SIGN.4dm](/capture/test/Project/Sources/Methods/SIGN.4dm) on how to enable the plugin in 4D.
 
 # 4d-plugin-capture-v2
 Simple video capture based on [AVFoundation](https://developer.apple.com/av-foundation/).

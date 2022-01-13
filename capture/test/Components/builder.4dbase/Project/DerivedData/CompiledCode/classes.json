@@ -1,0 +1,77 @@
+{
+	"SignApp": {
+		"functions": {
+			"sign": 2147483617,
+			"notarize": 2147483616,
+			"_staple": 2147483615,
+			"_altool": 2147483614,
+			"notarizationInfo": 2147483613,
+			"archive": 2147483612,
+			"_signDatabase": 2147483611,
+			"_removeComponentPlugins": 2147483610,
+			"_removePHP": 2147483609,
+			"_removeSignature": 2147483608,
+			"_signComponents": 2147483607,
+			"_signNativeComponents": 2147483606,
+			"_signInternalComponents": 2147483605,
+			"_signPlugins": 2147483604,
+			"_signFrameworks": 2147483603,
+			"_signContents": 2147483602,
+			"_signMecab": 2147483601,
+			"_signSASLPlugins": 2147483600,
+			"_signPHP": 2147483599,
+			"_signBin": 2147483598,
+			"_signHelpers": 2147483597,
+			"_signUpdater": 2147483596,
+			"_signMobile": 2147483595,
+			"_signApp": 2147483594,
+			"_deleteTempFiles": 2147483593,
+			"_copyDefaultProperties": 2147483592,
+			"_copyDefaultEntitlements": 2147483591,
+			"install_name_tool": 2147483590,
+			"pkgbuild": 2147483589,
+			"hdiutil": 2147483588,
+			"ditto": 2147483587,
+			"codesign": 2147483586,
+			"_lowercaseExecutableName": 2147483585,
+			"_updateProperties": 2147483584,
+			"_clean": 2147483583,
+			"setXcodePath": 2147483582,
+			"getXcodePath": 2147483581,
+			"listProviders": 2147483580,
+			"findIdentity": 2147483579
+		},
+		"constructorID": 2147483618
+	},
+	"Console": {
+		"functions": {
+			"printInformation": 2147483625,
+			"printWarning": 2147483624,
+			"printError": 2147483623,
+			"printErrors": 2147483622,
+			"printStatus": 2147483621,
+			"print": 2147483620
+		},
+		"constructorID": 2147483626
+	},
+	"BuildApp": {
+		"functions": {
+			"findLicenses": 2147483634,
+			"getPlatformDestinationFolder": 2147483633,
+			"getDefaultSettingsFile": 2147483632,
+			"openProject": 2147483631,
+			"build": 2147483630,
+			"save": 2147483629,
+			"_getSettings": 2147483628
+		},
+		"constructorID": 2147483635
+	},
+	"App": {
+		"functions": {
+			"_getBundleExecutable": 2147483639,
+			"open": 2147483638,
+			"encodeObject": 2147483637
+		},
+		"constructorID": 2147483640
+	}
+}

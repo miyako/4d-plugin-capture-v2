@@ -1,4 +1,4 @@
-﻿{
+{
 	"Sources/Methods/generate_project_xcode.4dm": {
 		"startSelection": 0,
 		"endSelection": 0,
@@ -27,13 +27,13 @@
 		"stamp": "2019-07-24T08:49:03.338Z"
 	},
 	"Sources/Methods/generate_project.4dm": {
-		"startSelection": 38,
-		"endSelection": 38,
-		"firstSelectedLine": 10,
-		"lastSelectedLine": 10,
+		"startSelection": 31,
+		"endSelection": 31,
+		"firstSelectedLine": 2,
+		"lastSelectedLine": 2,
 		"folding": [],
 		"bookmarks": [],
-		"stamp": "2019-10-03T02:17:03.648Z"
+		"stamp": "2022-01-13T03:49:32.155Z"
 	},
 	"Sources/Methods/generate_project_source.4dm": {
 		"startSelection": 18,
@@ -171,13 +171,13 @@
 		"stamp": "2019-07-02T23:15:40.975Z"
 	},
 	"Sources/Methods/TEST.4dm": {
-		"startSelection": 7,
-		"endSelection": 7,
-		"firstSelectedLine": 46,
-		"lastSelectedLine": 46,
+		"startSelection": 25,
+		"endSelection": 25,
+		"firstSelectedLine": 0,
+		"lastSelectedLine": 0,
 		"folding": [],
 		"bookmarks": [],
-		"stamp": "2019-10-14T14:13:59.669Z"
+		"stamp": "2022-01-13T04:19:48.040Z"
 	},
 	"Sources/Methods/TEST_v17.4dm": {
 		"startSelection": 0,
@@ -188,203 +188,23 @@
 		"bookmarks": [],
 		"stamp": "2019-07-07T00:13:49.000Z"
 	},
-	"Sources/Forms/フォーム1/ObjectMethods/Button.4dm": {
-		"startSelection": 10,
-		"endSelection": 0,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-03T08:08:25.735Z"
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/flipH.4dm": {
-		"startSelection": 21,
-		"endSelection": 21,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-04T03:15:26.926Z"
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/flipV.4dm": {
-		"startSelection": 21,
-		"endSelection": 21,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-04T03:15:26.933Z"
-	},
-	"Sources/Forms/フォーム1/method.4dm": {
-		"startSelection": 0,
-		"endSelection": 0,
-		"firstSelectedLine": 17,
-		"lastSelectedLine": 16,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-04T03:09:59.620Z"
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/Stop.4dm": {
+	"Sources/Methods/update_manifest_json.4dm": {
 		"startSelection": 0,
 		"endSelection": 0,
 		"firstSelectedLine": 0,
 		"lastSelectedLine": 0,
 		"folding": [],
 		"bookmarks": [],
-		"stamp": "2019-10-04T02:31:30.659Z"
+		"stamp": "2022-01-13T03:48:31.972Z"
 	},
-	"Sources/Forms/フォーム1/ObjectMethods/Snap.4dm": {
-		"startSelection": 10,
-		"endSelection": 0,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-03T08:08:25.735Z"
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/Start.4dm": {
-		"startSelection": 20,
-		"endSelection": 20,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-04T02:31:55.678Z"
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/Start recording.4dm": {
-		"startSelection": 29,
-		"endSelection": 29,
-		"firstSelectedLine": 2,
-		"lastSelectedLine": 2,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-04T08:46:13.891Z"
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/Stop recording.4dm": {
-		"startSelection": 23,
-		"endSelection": 23,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-04T08:52:32.012Z"
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/Pause recording.4dm": {
-		"startSelection": 13,
-		"endSelection": 13,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-04T08:52:54.417Z"
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/Resume recording.4dm": {
-		"startSelection": 14,
-		"endSelection": 14,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-04T08:53:12.221Z"
-	},
-	"Sources/Methods/altool.4dm": {
-		"startSelection": 0,
-		"endSelection": 0,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-14T16:02:06.570Z"
-	},
-	"Sources/Methods/error_xml.4dm": {
-		"startSelection": 0,
-		"endSelection": 0,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-14T16:00:45.248Z"
-	},
-	"Sources/Methods/escape_param.4dm": {
-		"startSelection": 0,
-		"endSelection": 0,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-14T16:00:37.641Z"
-	},
-	"Sources/Methods/install_name_tool.4dm": {
-		"startSelection": 0,
-		"endSelection": 0,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-14T16:01:57.733Z"
-	},
-	"Sources/Methods/codesign.4dm": {
-		"startSelection": 11,
-		"endSelection": 11,
-		"firstSelectedLine": 319,
-		"lastSelectedLine": 319,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-14T16:01:16.181Z"
-	},
-	"Sources/Methods/ditto.4dm": {
+	"Sources/Methods/SIGN.4dm": {
 		"startSelection": 7,
 		"endSelection": 7,
-		"firstSelectedLine": 50,
-		"lastSelectedLine": 50,
+		"firstSelectedLine": 26,
+		"lastSelectedLine": 26,
 		"folding": [],
 		"bookmarks": [],
-		"stamp": "2019-10-14T16:01:00.342Z"
-	},
-	"Sources/Methods/find_identity.4dm": {
-		"startSelection": 0,
-		"endSelection": 0,
-		"firstSelectedLine": 25,
-		"lastSelectedLine": 25,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-14T16:00:30.972Z"
-	},
-	"Sources/Methods/hdiutil.4dm": {
-		"startSelection": 11,
-		"endSelection": 11,
-		"firstSelectedLine": 84,
-		"lastSelectedLine": 84,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-14T16:01:35.788Z"
-	},
-	"Sources/Methods/xcode_get_path.4dm": {
-		"startSelection": 0,
-		"endSelection": 0,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-14T16:02:17.698Z"
-	},
-	"Sources/Methods/xcode_select.4dm": {
-		"startSelection": 0,
-		"endSelection": 0,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-14T16:02:22.289Z"
-	},
-	"Sources/Methods/xcode_SET_PATH.4dm": {
-		"startSelection": 0,
-		"endSelection": 0,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-14T16:02:26.848Z"
+		"stamp": "2022-01-13T04:18:54.873Z"
 	},
 	"Sources/Forms/TEST/method.4dm": {
 		"startSelection": 0,
@@ -394,37 +214,18 @@
 		"folding": [
 			3,
 			28,
-			43,
-			78
+			43
 		],
 		"bookmarks": [],
-		"stamp": "2019-11-26T16:19:35.794Z"
+		"stamp": "2021-06-24T13:30:24.000Z"
 	},
-	"Sources/Methods/pkgbuild.4dm": {
-		"startSelection": 11,
-		"endSelection": 11,
-		"firstSelectedLine": 105,
-		"lastSelectedLine": 105,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-10-14T16:00:12.678Z"
-	},
-	"Sources/Forms/TEST/ObjectMethods/Form.4dm": {
+	"Sources/Forms/TEST/ObjectMethods/Start recording.4dm": {
 		"startSelection": 0,
 		"endSelection": 0,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
+		"firstSelectedLine": 3,
+		"lastSelectedLine": 3,
 		"folding": [],
 		"bookmarks": [],
-		"stamp": "2019-10-23T09:01:06.419Z"
-	},
-	"Sources/Methods/LIST.4dm": {
-		"startSelection": 7,
-		"endSelection": 7,
-		"firstSelectedLine": 0,
-		"lastSelectedLine": 0,
-		"folding": [],
-		"bookmarks": [],
-		"stamp": "2019-11-26T16:19:59.432Z"
+		"stamp": "2021-06-24T13:30:24.000Z"
 	}
 }

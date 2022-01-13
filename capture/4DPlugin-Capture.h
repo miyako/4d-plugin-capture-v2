@@ -11,8 +11,9 @@
 #ifndef PLUGIN_CAPTURE_H
 #define PLUGIN_CAPTURE_H
 
-#include "4DPluginAPI.h"
-#include "4DPlugin-JSON.h"
+#include "4D Plugin API/4DPluginAPI.h"
+#include "support/4DPlugin-JSON.h"
+#include "include/json/json.h"
 
 #if VERSIONWIN
 #include "windows.h"
@@ -138,11 +139,11 @@ public:
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/CALayer.h>
 
-#ifndef errAEEventWouldRequireUserConsent
-enum {
-    errAEEventWouldRequireUserConsent     =     -1744
-};
-#endif
+//#ifndef errAEEventWouldRequireUserConsent
+//enum {
+//    errAEEventWouldRequireUserConsent     =     -1744
+//};
+//#endif
 
 typedef enum {
     

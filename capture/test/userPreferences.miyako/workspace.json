@@ -1,15 +1,32 @@
-﻿{
+{
 	"editors": [
 		{
+			"type": "method",
+			"id": 2147483639,
+			"previousTabType": "method",
+			"previousTabID": 2147483645,
+			"codeDescriptor": {
+				"type": 2,
+				"formName": "TEST",
+				"objectName": "Start recording",
+				"methodPath": "/SOURCES/Forms/TEST/ObjectMethods/Start recording.4dm"
+			}
+		},
+		{
+			"type": "method",
+			"id": 2147483645,
+			"previousTabType": "form",
+			"previousTabID": 218,
+			"codeDescriptor": {
+				"type": 3,
+				"formName": "TEST",
+				"methodPath": "/SOURCES/Forms/TEST/method.4dm"
+			}
+		},
+		{
 			"type": "form",
-			"id": 1,
+			"id": 218,
 			"formName": "TEST"
-		},
-		{
-			"type": "structure"
-		},
-		{
-			"type": "explorer"
 		}
 	]
 }

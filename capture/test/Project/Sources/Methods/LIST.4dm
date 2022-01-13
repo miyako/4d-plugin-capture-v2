@@ -1,1 +1,0 @@
-﻿//%attributes = {}$devices:=capture Devices 

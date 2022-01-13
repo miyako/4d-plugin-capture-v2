@@ -1,4 +1,4 @@
-﻿{
+{
 	"Sources/DatabaseMethods/onStartup.4dm": {
 		"left": 322,
 		"top": 651,
@@ -42,10 +42,10 @@
 		"height": 762
 	},
 	"Sources/Methods/generate_project.4dm": {
-		"left": 282,
-		"top": 358,
+		"left": 478,
+		"top": 140,
 		"width": 1129,
-		"height": 787
+		"height": 702
 	},
 	"Sources/Methods/generate_project_source.4dm": {
 		"left": 511,
@@ -144,10 +144,10 @@
 		"height": 762
 	},
 	"Sources/Methods/TEST.4dm": {
-		"left": 290,
-		"top": 225,
-		"width": 1347,
-		"height": 700
+		"left": 276,
+		"top": 190,
+		"width": 877,
+		"height": 637
 	},
 	"Sources/Methods/TEST_v17.4dm": {
 		"left": 450,
@@ -155,172 +155,28 @@
 		"width": 877,
 		"height": 662
 	},
-	"Sources/Forms/フォーム1/ObjectMethods/Button.4dm": {
+	"Sources/Methods/update_manifest_json.4dm": {
 		"left": 173,
-		"top": 187,
-		"width": 1183,
-		"height": 789
+		"top": 458,
+		"width": 1129,
+		"height": 702
 	},
-	"Sources/Forms/フォーム1/ObjectMethods/flipH.4dm": {
-		"left": 435,
-		"top": 226,
-		"width": 1183,
-		"height": 789
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/flipV.4dm": {
-		"left": 435,
-		"top": 226,
-		"width": 1183,
-		"height": 789
-	},
-	"Sources/Forms/フォーム1/method.4dm": {
-		"left": 435,
-		"top": 226,
-		"width": 1183,
-		"height": 789
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/Stop.4dm": {
-		"left": 373,
-		"top": 297,
-		"width": 1183,
-		"height": 789
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/Snap.4dm": {
-		"left": 317,
-		"top": 157,
-		"width": 1183,
-		"height": 789
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/Start.4dm": {
-		"left": 317,
-		"top": 157,
-		"width": 1183,
-		"height": 789
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/Start recording.4dm": {
-		"left": 435,
-		"top": 201,
-		"width": 1183,
-		"height": 814
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/Stop recording.4dm": {
-		"left": 435,
-		"top": 201,
-		"width": 1183,
-		"height": 814
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/Pause recording.4dm": {
-		"left": 435,
-		"top": 201,
-		"width": 1183,
-		"height": 814
-	},
-	"Sources/Forms/フォーム1/ObjectMethods/Resume recording.4dm": {
-		"left": 435,
-		"top": 201,
-		"width": 1183,
-		"height": 814
-	},
-	"Trash/Methods/(sign_app).4dm": {
-		"left": 180,
-		"top": 215,
-		"width": 1084,
-		"height": 741
-	},
-	"Sources/Methods/altool.4dm": {
-		"left": 28,
-		"top": 435,
-		"width": 1084,
-		"height": 741
-	},
-	"Sources/Methods/error_xml.4dm": {
-		"left": 28,
-		"top": 435,
-		"width": 1084,
-		"height": 741
-	},
-	"Sources/Methods/escape_param.4dm": {
-		"left": 28,
-		"top": 435,
-		"width": 1084,
-		"height": 741
-	},
-	"Sources/Methods/install_name_tool.4dm": {
-		"left": 28,
-		"top": 435,
-		"width": 1084,
-		"height": 741
-	},
-	"Sources/Methods/codesign.4dm": {
-		"left": 611,
-		"top": 665,
-		"width": 1347,
-		"height": 725
-	},
-	"Sources/Methods/ditto.4dm": {
-		"left": 28,
-		"top": 435,
-		"width": 1084,
-		"height": 741
-	},
-	"Sources/Methods/find_identity.4dm": {
-		"left": 43,
-		"top": 486,
-		"width": 1084,
-		"height": 741
-	},
-	"Sources/Methods/hdiutil.4dm": {
-		"left": 28,
-		"top": 435,
-		"width": 1084,
-		"height": 741
-	},
-	"Sources/Methods/xcode_get_path.4dm": {
-		"left": 28,
-		"top": 435,
-		"width": 1084,
-		"height": 741
-	},
-	"Sources/Methods/xcode_select.4dm": {
-		"left": 28,
-		"top": 435,
-		"width": 1084,
-		"height": 741
-	},
-	"Sources/Methods/xcode_SET_PATH.4dm": {
-		"left": 28,
-		"top": 435,
-		"width": 1084,
-		"height": 741
+	"Sources/Methods/SIGN.4dm": {
+		"left": 276,
+		"top": 218,
+		"width": 877,
+		"height": 609
 	},
 	"Sources/Forms/TEST/method.4dm": {
-		"left": 437,
-		"top": 185,
-		"width": 724,
-		"height": 620
+		"left": 264,
+		"top": 214,
+		"width": 902,
+		"height": 564
 	},
-	"Sources/Methods/pkgbuild.4dm": {
-		"left": 747,
-		"top": 548,
-		"width": 778,
-		"height": 488
-	},
-	"Sources/Forms/TEST/ObjectMethods/Form.4dm": {
-		"left": 451,
-		"top": 232,
-		"width": 778,
-		"height": 488
-	},
-	"Sources/Methods/LIST.4dm": {
-		"left": 541,
-		"top": 753,
-		"width": 1024,
-		"height": 705
-	},
-	"Trash/Methods/(PP).4dm": {
-		"left": 231,
-		"top": 448,
-		"width": 774,
-		"height": 378
+	"Sources/Forms/TEST/ObjectMethods/Start recording.4dm": {
+		"left": 264,
+		"top": 186,
+		"width": 902,
+		"height": 592
 	}
 }

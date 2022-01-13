@@ -4,10 +4,34 @@
         <note>Capture</note>
     </header>
     <group resname="themes">
-        <trans-unit id="" resname="2DBCBB62B0264ED69F68DA627518AD71" translate="no">
-            <source>capture</source>
+        <trans-unit id="" resname="C401DED401704265BCFB23D5CC199AAE" translate="no">
+            <source>codec</source>
         </trans-unit>
     </group>
-    <group restype="x-4DK#" d4:groupName="2DBCBB62B0264ED69F68DA627518AD71">
+    <group restype="x-4DK#" d4:groupName="C401DED401704265BCFB23D5CC199AAE">
+        <trans-unit d4:value="0:L" id="C401DED401704265BCFB23D5CC199AAE.1">
+            <source>base64_rfc4648</source>
+        </trans-unit>
+        <trans-unit d4:value="1:L" id="C401DED401704265BCFB23D5CC199AAE.2">
+            <source>base64_url</source>
+        </trans-unit>
+        <trans-unit d4:value="2:L" id="C401DED401704265BCFB23D5CC199AAE.3">
+            <source>base64_url_unpadded</source>
+        </trans-unit>
+        <trans-unit d4:value="3:L" id="C401DED401704265BCFB23D5CC199AAE.4">
+            <source>base32_rfc4648</source>
+        </trans-unit>
+        <trans-unit d4:value="4:L" id="C401DED401704265BCFB23D5CC199AAE.5">
+            <source>base32_crockford</source>
+        </trans-unit>
+        <trans-unit d4:value="5:L" id="C401DED401704265BCFB23D5CC199AAE.6">
+            <source>base32_hex</source>
+        </trans-unit>
+        <trans-unit d4:value="6:L" id="C401DED401704265BCFB23D5CC199AAE.7">
+            <source>hex_upper</source>
+        </trans-unit>
+        <trans-unit d4:value="7:L" id="C401DED401704265BCFB23D5CC199AAE.8">
+            <source>hex_lower</source>
+        </trans-unit>
     </group>
 </xliff>

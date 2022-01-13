@@ -1,0 +1,1022 @@
+{
+	"map": [
+		{
+			"id": 2147483647,
+			"path": "Sources/Methods/TEST_builder.4dm"
+		},
+		{
+			"id": 2147483646,
+			"path": "Sources/Methods/BuildApp.4dm"
+		},
+		{
+			"id": 2147483645,
+			"path": "Sources/Methods/ON_PARSE_ERROR.4dm"
+		},
+		{
+			"id": 2147483644,
+			"path": "Sources/Methods/SignApp.4dm"
+		},
+		{
+			"id": 2147483643,
+			"path": "Sources/Methods/Compiler_Methods.4dm"
+		},
+		{
+			"id": 2147483642,
+			"path": "Sources/Methods/escape_param.4dm"
+		},
+		{
+			"id": 2147483641,
+			"path": "Sources/Classes/App.4dm"
+		},
+		{
+			"id": 2147483640,
+			"path": "Sources/Classes/App.4dm",
+			"function": "#",
+			"parameters": [
+				{
+					"parameterName": "",
+					"parameterType": 0
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1216
+				}
+			]
+		},
+		{
+			"id": 2147483639,
+			"path": "Sources/Classes/App.4dm",
+			"function": "_getBundleExecutable",
+			"parameters": [
+				{
+					"parameterName": "executableFile",
+					"parameterType": 1709
+				}
+			]
+		},
+		{
+			"id": 2147483638,
+			"path": "Sources/Classes/App.4dm",
+			"function": "open",
+			"parameters": [
+				{
+					"parameterName": "status",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "params",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483637,
+			"path": "Sources/Classes/App.4dm",
+			"function": "encodeObject",
+			"parameters": [
+				{
+					"parameterName": "encodedObject",
+					"parameterType": 284
+				},
+				{
+					"parameterName": "object",
+					"parameterType": 1216
+				}
+			]
+		},
+		{
+			"id": 2147483636,
+			"path": "Sources/Classes/BuildApp.4dm"
+		},
+		{
+			"id": 2147483635,
+			"path": "Sources/Classes/BuildApp.4dm",
+			"function": "#",
+			"parameters": [
+				{
+					"parameterName": "",
+					"parameterType": 0
+				},
+				{
+					"parameterName": "settingsFile",
+					"parameterType": 1216
+				}
+			]
+		},
+		{
+			"id": 2147483634,
+			"path": "Sources/Classes/BuildApp.4dm",
+			"function": "findLicenses",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "licenseTypes",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483633,
+			"path": "Sources/Classes/BuildApp.4dm",
+			"function": "getPlatformDestinationFolder",
+			"parameters": [
+				{
+					"parameterName": "folder",
+					"parameterType": 1709
+				}
+			]
+		},
+		{
+			"id": 2147483632,
+			"path": "Sources/Classes/BuildApp.4dm",
+			"function": "getDefaultSettingsFile",
+			"parameters": [
+				{
+					"parameterName": "settingsFile",
+					"parameterType": 1709
+				}
+			]
+		},
+		{
+			"id": 2147483631,
+			"path": "Sources/Classes/BuildApp.4dm",
+			"function": "openProject",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "appName",
+					"parameterType": 284
+				}
+			]
+		},
+		{
+			"id": 2147483630,
+			"path": "Sources/Classes/BuildApp.4dm",
+			"function": "build",
+			"parameters": [
+				{
+					"parameterName": "status",
+					"parameterType": 1216
+				}
+			]
+		},
+		{
+			"id": 2147483629,
+			"path": "Sources/Classes/BuildApp.4dm",
+			"function": "save",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				}
+			]
+		},
+		{
+			"id": 2147483628,
+			"path": "Sources/Classes/BuildApp.4dm",
+			"function": "_getSettings",
+			"parameters": [
+				{
+					"parameterName": "BuildApp",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "settingsFile",
+					"parameterType": 1709
+				}
+			]
+		},
+		{
+			"id": 2147483627,
+			"path": "Sources/Classes/Console.4dm"
+		},
+		{
+			"id": 2147483626,
+			"path": "Sources/Classes/Console.4dm",
+			"function": "#",
+			"parameters": [
+				{
+					"parameterName": "",
+					"parameterType": 0
+				},
+				{
+					"parameterName": "project",
+					"parameterType": 1709
+				}
+			]
+		},
+		{
+			"id": 2147483625,
+			"path": "Sources/Classes/Console.4dm",
+			"function": "printInformation",
+			"parameters": [
+				{
+					"parameterName": "",
+					"parameterType": 0
+				},
+				{
+					"parameterName": "message",
+					"parameterType": 284
+				}
+			]
+		},
+		{
+			"id": 2147483624,
+			"path": "Sources/Classes/Console.4dm",
+			"function": "printWarning",
+			"parameters": [
+				{
+					"parameterName": "",
+					"parameterType": 0
+				},
+				{
+					"parameterName": "message",
+					"parameterType": 284
+				}
+			]
+		},
+		{
+			"id": 2147483623,
+			"path": "Sources/Classes/Console.4dm",
+			"function": "printError",
+			"parameters": [
+				{
+					"parameterName": "",
+					"parameterType": 0
+				},
+				{
+					"parameterName": "message",
+					"parameterType": 284
+				}
+			]
+		},
+		{
+			"id": 2147483622,
+			"path": "Sources/Classes/Console.4dm",
+			"function": "printErrors",
+			"parameters": [
+				{
+					"parameterName": "",
+					"parameterType": 0
+				},
+				{
+					"parameterName": "status",
+					"parameterType": 1216
+				}
+			]
+		},
+		{
+			"id": 2147483621,
+			"path": "Sources/Classes/Console.4dm",
+			"function": "printStatus",
+			"parameters": [
+				{
+					"parameterName": "",
+					"parameterType": 0
+				},
+				{
+					"parameterName": "success",
+					"parameterType": 305
+				}
+			]
+		},
+		{
+			"id": 2147483620,
+			"path": "Sources/Classes/Console.4dm",
+			"function": "print",
+			"parameters": [
+				{
+					"parameterName": "",
+					"parameterType": 0
+				},
+				{
+					"parameterName": "error",
+					"parameterType": 1216
+				}
+			]
+		},
+		{
+			"id": 2147483619,
+			"path": "Sources/Classes/SignApp.4dm"
+		},
+		{
+			"id": 2147483618,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "#",
+			"parameters": [
+				{
+					"parameterName": "",
+					"parameterType": 0
+				},
+				{
+					"parameterName": "credentials",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "plist",
+					"parameterType": 1216
+				}
+			]
+		},
+		{
+			"id": 2147483617,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "sign",
+			"parameters": [
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				}
+			]
+		},
+		{
+			"id": 2147483616,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "notarize",
+			"parameters": [
+				{
+					"parameterName": "status",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "file",
+					"parameterType": 1709
+				}
+			]
+		},
+		{
+			"id": 2147483615,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_staple",
+			"parameters": [
+				{
+					"parameterName": "status",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "file",
+					"parameterType": 1709
+				}
+			]
+		},
+		{
+			"id": 2147483614,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_altool",
+			"parameters": [
+				{
+					"parameterName": "status",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "params",
+					"parameterType": 1216
+				}
+			]
+		},
+		{
+			"id": 2147483613,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "notarizationInfo",
+			"parameters": [
+				{
+					"parameterName": "status",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "RequestUUID",
+					"parameterType": 284
+				}
+			]
+		},
+		{
+			"id": 2147483612,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "archive",
+			"parameters": [
+				{
+					"parameterName": "status",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				}
+			]
+		},
+		{
+			"id": 2147483611,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_signDatabase",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483610,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_removeComponentPlugins",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483609,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_removePHP",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483608,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_removeSignature",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483607,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_signComponents",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483606,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_signNativeComponents",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483605,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_signInternalComponents",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483604,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_signPlugins",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483603,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_signFrameworks",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483602,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_signContents",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483601,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_signMecab",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483600,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_signSASLPlugins",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483599,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_signPHP",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483598,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_signBin",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483597,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_signHelpers",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483596,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_signUpdater",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483595,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_signMobile",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483594,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_signApp",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483593,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_deleteTempFiles",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				}
+			]
+		},
+		{
+			"id": 2147483592,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_copyDefaultProperties",
+			"parameters": [
+				{
+					"parameterName": "keys",
+					"parameterType": 1216
+				}
+			]
+		},
+		{
+			"id": 2147483591,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_copyDefaultEntitlements",
+			"parameters": [
+				{
+					"parameterName": "entitlements",
+					"parameterType": 1216
+				}
+			]
+		},
+		{
+			"id": 2147483590,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "install_name_tool",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "src",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "from",
+					"parameterType": 284
+				},
+				{
+					"parameterName": "to",
+					"parameterType": 284
+				},
+				{
+					"parameterName": "statuses",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483589,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "pkgbuild",
+			"parameters": [
+				{
+					"parameterName": "status",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "src",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "dst",
+					"parameterType": 1709
+				}
+			]
+		},
+		{
+			"id": 2147483588,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "hdiutil",
+			"parameters": [
+				{
+					"parameterName": "status",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "src",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "dst",
+					"parameterType": 1709
+				}
+			]
+		},
+		{
+			"id": 2147483587,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "ditto",
+			"parameters": [
+				{
+					"parameterName": "status",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "src",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "dst",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "noParentFolder",
+					"parameterType": 305
+				}
+			]
+		},
+		{
+			"id": 2147483586,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "codesign",
+			"parameters": [
+				{
+					"parameterName": "status",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "hardenedRuntime",
+					"parameterType": 305
+				},
+				{
+					"parameterName": "options",
+					"parameterType": 1216
+				}
+			]
+		},
+		{
+			"id": 2147483585,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_lowercaseExecutableName",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "infoPlistFile",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "keys",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "status",
+					"parameterType": 1216
+				}
+			]
+		},
+		{
+			"id": 2147483584,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_updateProperties",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "infoPlistFile",
+					"parameterType": 1709
+				},
+				{
+					"parameterName": "keys",
+					"parameterType": 1216
+				},
+				{
+					"parameterName": "status",
+					"parameterType": 1216
+				}
+			]
+		},
+		{
+			"id": 2147483583,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "_clean",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "app",
+					"parameterType": 1709
+				}
+			]
+		},
+		{
+			"id": 2147483582,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "setXcodePath",
+			"parameters": [
+				{
+					"parameterName": "this",
+					"parameterType": 1710
+				},
+				{
+					"parameterName": "Xcode",
+					"parameterType": 1709
+				}
+			]
+		},
+		{
+			"id": 2147483581,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "getXcodePath",
+			"parameters": [
+				{
+					"parameterName": "Xcode",
+					"parameterType": 1216
+				}
+			]
+		},
+		{
+			"id": 2147483580,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "listProviders",
+			"parameters": [
+				{
+					"parameterName": "providers",
+					"parameterType": 1488
+				}
+			]
+		},
+		{
+			"id": 2147483579,
+			"path": "Sources/Classes/SignApp.4dm",
+			"function": "findIdentity",
+			"parameters": [
+				{
+					"parameterName": "identity",
+					"parameterType": 1488
+				}
+			]
+		}
+	],
+	"targets": {
+		"x86_64_generic": true,
+		"arm64_macOS_lib": true
+	},
+	"arch64": true
+}

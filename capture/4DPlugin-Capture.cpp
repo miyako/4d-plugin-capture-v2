@@ -309,7 +309,13 @@ void addSublayer(addSublayerCtx *ctx) {
 
 	[captureSession beginConfiguration];
 
-	if (!uniqueID) {
+    std::string device;
+    
+    if(uniqueID) {
+        device = uniqueID;
+    }
+    
+	if (device.length() == 0) {
 
 		videoDevice = [AVCaptureDevice defaultDeviceWithMediaType : AVMediaTypeVideo];
         self.deviceUniqueID = [videoDevice uniqueID];
@@ -696,6 +702,13 @@ void capture_Image(PA_PluginParameters params) {
 #endif
 }
 
+static void _capture_Stop(Json::Value *value) {
+    
+    Json::Value options = *value;
+    
+    [captureMan performSelectorInBackground:@selector(stopRunning) withObject:nil];
+
+}
 void capture_Stop(PA_PluginParameters params) {
  
 #if VERSIONMAC
@@ -703,7 +716,9 @@ void capture_Stop(PA_PluginParameters params) {
     if(request_permission_granted) {
         if(captureMan)
         {
-            [captureMan performSelectorInBackground:@selector(stopRunning) withObject:nil];
+            Json::Value options;
+            
+            PA_RunInMainProcess((PA_RunInMainProcessProcPtr)_capture_Stop, &options);
         }
     }
 #else
@@ -713,6 +728,27 @@ void capture_Stop(PA_PluginParameters params) {
 #endif
 }
 
+static void _capture_Update(Json::Value *value) {
+        
+    Json::Value options = *value;
+    
+    PA_long32 x = options["x"].asInt();
+    PA_long32 y = options["y"].asInt();
+    PA_long32 width = options["width"].asInt();
+    PA_long32 height = options["height"].asInt();
+    
+    bool flipV = options["flipV"].asBool();
+    bool flipH = options["flipH"].asBool();
+    bool hidden = options["hidden"].asBool();
+    
+    NSRect rect;
+    rect.origin.x = x;
+    rect.origin.y = y;
+    rect.size.width = width;
+    rect.size.height = height;
+    
+    [captureMan updatePreviewLayerFrame:rect flipH:flipH flipV:flipV hidden:hidden];
+}
 void capture_Update(PA_PluginParameters params) {
 
 #if VERSIONMAC
@@ -733,17 +769,20 @@ void capture_Update(PA_PluginParameters params) {
                 bool flipH = ob_get_b(param, L"flipH");
                 bool hidden = ob_get_b(param, L"hidden");
                 
-                NSRect rect;
-                rect.origin.x = x;
-                rect.origin.y = y;
-                rect.size.width = width;
-                rect.size.height = height;
+                Json::Value options;
                 
-                [captureMan updatePreviewLayerFrame:rect flipH:flipH flipV:flipV hidden:hidden];
+                options["x"] = x;
+                options["y"] = y;
+                options["width"] = width;
+                options["height"] = height;
+                options["flipV"] = flipV;
+                options["flipH"] = flipH;
+                options["hidden"] = hidden;
+                
+                PA_RunInMainProcess((PA_RunInMainProcessProcPtr)_capture_Update, &options);
             }
         }
     }
-    
 #else
     PA_ObjectRef param = PA_GetObjectParameter(params, 1);
     
@@ -766,6 +805,30 @@ void capture_Update(PA_PluginParameters params) {
 #endif
 }
 
+static void _capture_Start_recording(Json::Value *value) {
+    
+    Json::Value options = *value;
+    
+    NSString *str = [[NSString alloc]initWithUTF8String:options["path"].asString().c_str()];
+    
+    CMTime maxRecordedDuration = kCMTimeInvalid;
+    
+    if(options.isMember("maxRecordedDuration"))
+        maxRecordedDuration = CMTimeMakeWithSeconds(options["maxRecordedDuration"].asInt(), 1);
+    
+    int64_t maxRecordedFileSize = 0;
+    
+    if(options.isMember("maxRecordedFileSize"))
+        maxRecordedFileSize = options["maxRecordedFileSize"].asInt();
+    
+    if(str) {
+        NSURL *url = (NSURL *)CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (CFStringRef)str, kCFURLHFSPathStyle, false);
+        [captureMan performSelectorInBackground:@selector(startRecording:) withObject:url];
+        [url release];
+        [str release];
+    }
+    
+}
 void capture_Start_recording(PA_PluginParameters params) {
     
 #if VERSIONMAC
@@ -775,70 +838,227 @@ void capture_Start_recording(PA_PluginParameters params) {
         
         if(param) {
             
-            CUTF8String path;
-            ob_get_s(param, L"file", &path);
-            NSString *str = [[NSString alloc]initWithUTF8String:(const char *)path.c_str()];
+            std::string path;
+            CUTF8String _path;
             
-            CMTime maxRecordedDuration = kCMTimeInvalid;
+            if(ob_get_s(param, L"file", &_path)) {
+                path = (const char *)_path.c_str();
+            }
+            
+            Json::Value options;
+            
+            options["path"] = path;
+            
             if(ob_is_defined(param, L"maxRecordedDuration")) {
-                maxRecordedDuration = CMTimeMakeWithSeconds(ob_get_n(param, L"maxRecordedDuration"), 1);
+                options["maxRecordedDuration"] = ob_get_n(param, L"maxRecordedDuration");
             }
             
-            int64_t maxRecordedFileSize = 0;
             if(ob_is_defined(param, L"maxRecordedFileSize")) {
-                maxRecordedFileSize = ob_get_n(param, L"maxRecordedFileSize");
+                options["maxRecordedFileSize"] = ob_get_n(param, L"maxRecordedFileSize");
             }
-            
-            
-            
-            
-            
-
-            
-            
-            if(str) {
-                NSURL *url = (NSURL *)CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (CFStringRef)str, kCFURLHFSPathStyle, false);
-                [captureMan performSelectorInBackground:@selector(startRecording:) withObject:url];
-                [url release];
-                [str release];
-            }
+          
+            PA_RunInMainProcess((PA_RunInMainProcessProcPtr)_capture_Start_recording, &options);
+                       
         }
     }
     
 #endif
 }
 
+static void _capture_Pause_recording(Json::Value *value) {
+    
+    Json::Value options = *value;
+    
+    [captureMan performSelectorInBackground:@selector(pauseRecording) withObject:nil];
+    
+}
 void capture_Pause_recording(PA_PluginParameters params) {
     
 #if VERSIONMAC
     if(request_permission_granted) {
-        [captureMan performSelectorInBackground:@selector(pauseRecording) withObject:nil];
+        
+        Json::Value options;
+        
+        PA_RunInMainProcess((PA_RunInMainProcessProcPtr)_capture_Pause_recording, &options);
+
     }
     
 #endif
 }
 
+static void _capture_Resume_recording(Json::Value *value) {
+    
+    Json::Value options = *value;
+    
+    [captureMan performSelectorInBackground:@selector(resumeRecording) withObject:nil];
+    
+}
 void capture_Resume_recording(PA_PluginParameters params) {
     
 #if VERSIONMAC
     if(request_permission_granted) {
-        [captureMan performSelectorInBackground:@selector(resumeRecording) withObject:nil];
+        
+        Json::Value options;
+        
+        PA_RunInMainProcess((PA_RunInMainProcessProcPtr)_capture_Resume_recording, &options);
+
     }
     
 #endif
 }
 
+static void _capture_Stop_recording(Json::Value *value) {
+    
+    Json::Value options = *value;
+ 
+    [captureMan performSelectorInBackground:@selector(stopRecording) withObject:nil];
+
+}
 void capture_Stop_recording(PA_PluginParameters params) {
 
 #if VERSIONMAC
     
     if(request_permission_granted) {
-        [captureMan performSelectorInBackground:@selector(stopRecording) withObject:nil];
+        
+        Json::Value options;
+        
+        PA_RunInMainProcess((PA_RunInMainProcessProcPtr)_capture_Stop_recording, &options);
+        
     }
     
 #endif
 }
 
+static void _capture_Start(Json::Value *value) {
+    
+    Json::Value options = *value;
+    
+    PA_long32 w = options["w"].asInt();
+    PA_long32 x = options["x"].asInt();
+    PA_long32 y = options["y"].asInt();
+    PA_long32 width = options["width"].asInt();
+    PA_long32 height = options["height"].asInt();
+    
+    bool flipV = options["flipV"].asBool();
+    bool flipH = options["flipH"].asBool();
+    bool force = options["force"].asBool();
+    
+    std::string uniqueID = options["uniqueID"].asString();
+    std::string codec = options["codec"].asString();
+    std::string preset = options["preset"].asString();
+    
+    NSWindow *window = getWindow(w);
+    
+    if(window) {
+        NSView *contentView = [window contentView];
+        if(!captureMan)
+        {
+            captureMan = [[CaptureMan alloc]initWithUniqueID:uniqueID.c_str()];
+            force = false;/* captureMan is not instantiated yet */
+            
+        }else if((uniqueID.length()) && (![captureMan isDeviceUniqueID:uniqueID.c_str()])) {
+            force = true;/* uniqueID changed; force */
+        }/* on mac we can chenge window without force */
+
+        if(force) {
+            [captureMan release];
+            captureMan = [[CaptureMan alloc]initWithUniqueID:uniqueID.c_str()];
+        }
+        
+        NSRect rect;
+        rect.origin.x = x;
+        rect.origin.y = y;
+        rect.size.width = width;
+        rect.size.height = height;
+        
+        [captureMan setPreviewLayerView:contentView frame:rect flipH:flipH flipV:flipV];
+        
+        AVVideoCodecType videoCodec = nil;
+        
+        if(codec == "JPEG") {
+            videoCodec = AVVideoCodecTypeJPEG;
+        }
+        if(codec == "H264") {
+            videoCodec = AVVideoCodecTypeH264;
+        }
+        if(codec == "HEVC") {
+            videoCodec = AVVideoCodecTypeHEVC;
+        }
+        if(codec == "AppleProRes422") {
+            videoCodec = AVVideoCodecTypeAppleProRes422;
+        }
+        if(codec == "AppleProRes4444") {
+            videoCodec = AVVideoCodecTypeAppleProRes4444;
+        }
+            
+        if(videoCodec) {
+            [captureMan setVideoCodec:videoCodec];
+        }
+        
+        AVCaptureSessionPreset sessionPreset = AVCaptureSessionPresetHigh;
+        
+        if(preset == "low") {
+            sessionPreset = AVCaptureSessionPresetLow;
+        }
+        if(preset == "medium") {
+            sessionPreset = AVCaptureSessionPresetMedium;
+        }
+        if(preset == "high") {
+            sessionPreset = AVCaptureSessionPresetHigh;
+        }
+        if(preset == "960x540") {
+            sessionPreset = AVCaptureSessionPreset960x540;
+        }
+        if(preset == "1280x720") {
+            sessionPreset = AVCaptureSessionPreset1280x720;
+        }
+        if(preset == "i960x540") {
+            sessionPreset = AVCaptureSessionPresetiFrame960x540;
+        }
+        if(preset == "i1280x720") {
+            sessionPreset = AVCaptureSessionPresetiFrame1280x720;
+        }
+        if(preset == "320x240") {
+            sessionPreset = AVCaptureSessionPreset320x240;
+        }
+        if(preset == "640x480") {
+            sessionPreset = AVCaptureSessionPreset640x480;
+        }
+        if(preset == "352x288") {
+            sessionPreset = AVCaptureSessionPreset352x288;
+        }
+        
+        if(sessionPreset != AVCaptureSessionPresetHigh) {
+            [captureMan setSessionPreset:sessionPreset];
+        }
+
+        if(options.isMember("quality"))
+            [captureMan setVideoQuality:options["quality"].asInt()];
+        
+        if(options.isMember("averageBitRate"))
+            [captureMan setAverageBitRate:options["averageBitRate"].asInt()];
+        
+        if(options.isMember("maxKeyFrameInterval"))
+            [captureMan setMaxKeyFrameInterval:options["maxKeyFrameInterval"].asInt()];
+        
+        if(options.isMember("maxKeyFrameIntervalDuration"))
+            [captureMan setMaxKeyFrameIntervalDuration:options["maxKeyFrameIntervalDuration"].asInt()];
+        
+        if(options.isMember("videoWidth"))
+            [captureMan setVideoWidth:options["videoWidth"].asInt()];
+        
+        if(options.isMember("videoHeight"))
+            [captureMan setVideoHeight:options["videoHeight"].asInt()];
+        
+        if(options.isMember("maxRecordedDuration"))
+            [captureMan setMaxRecordedDuration:options["maxRecordedDuration"].asInt()];
+        
+        if(options.isMember("maxRecordedFileSize"))
+            [captureMan setMaxRecordedFileSize:options["maxRecordedFileSize"].asInt()];
+        
+        [captureMan performSelectorInBackground:@selector(startRunning) withObject:nil];
+    }
+}
 void capture_Start(PA_PluginParameters params) {
     
 #if VERSIONMAC
@@ -850,8 +1070,6 @@ void capture_Start(PA_PluginParameters params) {
         if(param) {
             
             PA_long32 w = (PA_long32)ob_get_n(param, L"window");
-            NSWindow *window = getWindow(w);
-            
             PA_long32 x = (PA_long32)ob_get_n(param, L"x");
             PA_long32 y = (PA_long32)ob_get_n(param, L"y");
             PA_long32 width = (PA_long32)ob_get_n(param, L"width");
@@ -859,7 +1077,6 @@ void capture_Start(PA_PluginParameters params) {
             
             bool flipV = ob_get_b(param, L"flipV");
             bool flipH = ob_get_b(param, L"flipH");
-            
             bool force = ob_get_b(param, L"force");
             
             std::string uniqueID;
@@ -869,142 +1086,71 @@ void capture_Start(PA_PluginParameters params) {
                 uniqueID = (const char *)_uniqueID.c_str();
             }
             
-            if(window) {
-                
-                NSView *contentView = [window contentView];
-                
-                if(!captureMan)
-                {
-
-                    captureMan = [[CaptureMan alloc]initWithUniqueID:uniqueID.c_str()];
-                    force = false;/* captureMan is not instantiated yet */
-                    
-                }else if((uniqueID.length()) && (![captureMan isDeviceUniqueID:uniqueID.c_str()])) {
-                    force = true;/* uniqueID changed; force */
-                }/* on mac we can chenge window without force */
-
-                if(force) {
-                    
-                    [captureMan release];
-                    captureMan = [[CaptureMan alloc]initWithUniqueID:uniqueID.c_str()];
-                    
-                }
-                
-                NSRect rect;
-                rect.origin.x = x;
-                rect.origin.y = y;
-                rect.size.width = width;
-                rect.size.height = height;
-                
-                [captureMan setPreviewLayerView:contentView frame:rect flipH:flipH flipV:flipV];
-                
-                CUTF8String codec;
-                AVVideoCodecType videoCodec = nil;
-                
-                if(ob_get_s(param, L"videoCodec", &codec)) {
-                    
-                    if(codec == (const uint8_t *)"JPEG") {
-                        videoCodec = AVVideoCodecTypeJPEG;
-                    }
-                    if(codec == (const uint8_t *)"H264") {
-                        videoCodec = AVVideoCodecTypeH264;
-                    }
-                    if(codec == (const uint8_t *)"HEVC") {
-                        videoCodec = AVVideoCodecTypeHEVC;
-                    }
-                    if(codec == (const uint8_t *)"AppleProRes422") {
-                        videoCodec = AVVideoCodecTypeAppleProRes422;
-                    }
-                    if(codec == (const uint8_t *)"AppleProRes4444") {
-                        videoCodec = AVVideoCodecTypeAppleProRes4444;
-                    }
-                    
-                }
-                
-                if(videoCodec) {
-                    [captureMan setVideoCodec:videoCodec];
-                }
-                
-                CUTF8String preset;
-                AVCaptureSessionPreset sessionPreset = AVCaptureSessionPresetHigh;
-                
-                if(ob_get_s(param, L"preset", &preset)) {
-                    
-                    if(preset == (const uint8_t *)"low") {
-                        sessionPreset = AVCaptureSessionPresetLow;
-                    }
-                    if(preset == (const uint8_t *)"medium") {
-                        sessionPreset = AVCaptureSessionPresetMedium;
-                    }
-                    if(preset == (const uint8_t *)"high") {
-                        sessionPreset = AVCaptureSessionPresetHigh;
-                    }
-                    if(preset == (const uint8_t *)"960x540") {
-                        sessionPreset = AVCaptureSessionPreset960x540;
-                    }
-                    if(preset == (const uint8_t *)"1280x720") {
-                        sessionPreset = AVCaptureSessionPreset1280x720;
-                    }
-                    if(preset == (const uint8_t *)"i960x540") {
-                        sessionPreset = AVCaptureSessionPresetiFrame960x540;
-                    }
-                    if(preset == (const uint8_t *)"i1280x720") {
-                        sessionPreset = AVCaptureSessionPresetiFrame1280x720;
-                    }
-                    if(preset == (const uint8_t *)"320x240") {
-                        sessionPreset = AVCaptureSessionPreset320x240;
-                    }
-                    if(preset == (const uint8_t *)"640x480") {
-                        sessionPreset = AVCaptureSessionPreset640x480;
-                    }
-                    if(preset == (const uint8_t *)"352x288") {
-                        sessionPreset = AVCaptureSessionPreset352x288;
-                    }
-                    
-                }
-                
-                if(sessionPreset != AVCaptureSessionPresetHigh) {
-                    [captureMan setSessionPreset:sessionPreset];
-                }
-                
-                if(ob_is_defined(param, L"quality")) {
-                    [captureMan setVideoQuality:ob_get_n(param, L"quality")];
-                }
-                
-                if(ob_is_defined(param, L"averageBitRate")) {
-                    [captureMan setAverageBitRate:ob_get_n(param, L"averageBitRate")];
-                }
-                
-                if(ob_is_defined(param, L"maxKeyFrameInterval")) {
-                    [captureMan setMaxKeyFrameInterval:ob_get_n(param, L"maxKeyFrameInterval")];
-                }
-                
-                if(ob_is_defined(param, L"maxKeyFrameIntervalDuration")) {
-                    [captureMan setMaxKeyFrameIntervalDuration:ob_get_n(param, L"maxKeyFrameIntervalDuration")];
-                }
-                
-                if(ob_is_defined(param, L"videoWidth")) {
-                    [captureMan setVideoWidth:ob_get_n(param, L"videoWidth")];
-                }
-
-                if(ob_is_defined(param, L"videoHeight")) {
-                    [captureMan setVideoHeight:ob_get_n(param, L"videoHeight")];
-                }
-                
-                if(ob_is_defined(param, L"maxRecordedDuration")) {
-                    [captureMan setMaxRecordedDuration:ob_get_n(param, L"maxRecordedDuration")];
-                }
-                
-                if(ob_is_defined(param, L"maxRecordedFileSize")) {
-                    [captureMan setMaxRecordedFileSize:ob_get_n(param, L"maxRecordedFileSize")];
-                }
-                
-                [captureMan performSelectorInBackground:@selector(startRunning) withObject:nil];
-                
+            std::string codec;
+            CUTF8String _codec;
+            
+            if(ob_get_s(param, L"videoCodec", &_codec)) {
+                codec = (const char *)_codec.c_str();
             }
+            
+            std::string preset;
+            CUTF8String _preset;
+            
+            if(ob_get_s(param, L"preset", &_preset)) {
+                preset = (const char *)_preset.c_str();
+            }
+            
+            Json::Value options;
+            
+            options["w"] = w;
+            options["x"] = x;
+            options["y"] = y;
+            options["width"] = width;
+            options["height"] = height;
+            options["flipV"] = flipV;
+            options["flipH"] = flipH;
+            options["force"] = force;
+            options["uniqueID"] = uniqueID;
+            options["codec"] = codec;
+            options["preset"] = preset;
+                            
+            if(ob_is_defined(param, L"quality")) {
+                options["quality"] = ob_get_n(param, L"quality");
+            }
+            
+            if(ob_is_defined(param, L"averageBitRate")) {
+                options["averageBitRate"] = ob_get_n(param, L"averageBitRate");
+            }
+            
+            if(ob_is_defined(param, L"maxKeyFrameInterval")) {
+                options["maxKeyFrameInterval"] = ob_get_n(param, L"maxKeyFrameInterval");
+            }
+            
+            if(ob_is_defined(param, L"maxKeyFrameIntervalDuration")) {
+                options["maxKeyFrameIntervalDuration"] = ob_get_n(param, L"maxKeyFrameIntervalDuration");
+            }
+            
+            if(ob_is_defined(param, L"videoWidth")) {
+                options["videoWidth"] = ob_get_n(param, L"videoWidth");
+            }
+            
+            if(ob_is_defined(param, L"videoHeight")) {
+                options["videoHeight"] = ob_get_n(param, L"videoHeight");
+            }
+            
+            if(ob_is_defined(param, L"maxRecordedDuration")) {
+                options["maxRecordedDuration"] = ob_get_n(param, L"maxRecordedDuration");
+            }
+            
+            if(ob_is_defined(param, L"maxRecordedFileSize")) {
+                options["maxRecordedFileSize"] = ob_get_n(param, L"maxRecordedFileSize");
+            }
+            
+            PA_RunInMainProcess((PA_RunInMainProcessProcPtr)_capture_Start, &options);
+            
         }
+        
     }
-
 #else
     PA_ObjectRef param = PA_GetObjectParameter(params, 1);
     
@@ -1099,7 +1245,6 @@ request_permission_t requestPermission(AVMediaType mediaType) {
 
 	return request_permission_unknown;
 }
-
 #endif
 
 /*

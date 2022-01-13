@@ -1,0 +1,44 @@
+{
+	"Sources/Methods/BuildApp.4dm": {
+		"left": 589,
+		"top": 233,
+		"width": 836,
+		"height": 609
+	},
+	"Sources/Methods/TEST_builder.4dm": {
+		"left": 453,
+		"top": 152,
+		"width": 836,
+		"height": 609
+	},
+	"Sources/Methods/SignApp.4dm": {
+		"left": 453,
+		"top": 124,
+		"width": 836,
+		"height": 637
+	},
+	"Trash/Methods/(TEST_sign).4dm": {
+		"left": 0,
+		"top": 113,
+		"width": 1034,
+		"height": 652
+	},
+	"Trash/Methods/(TEST_build).4dm": {
+		"left": 589,
+		"top": 233,
+		"width": 836,
+		"height": 609
+	},
+	"Sources/Classes/BuildApp.4dm": {
+		"left": 492,
+		"top": 216,
+		"width": 836,
+		"height": 609
+	},
+	"Sources/Classes/SignApp.4dm": {
+		"left": 453,
+		"top": 152,
+		"width": 836,
+		"height": 609
+	}
+}

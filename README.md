@@ -5,6 +5,8 @@
 
 See ~~[4d-utility-sign-app](https://github.com/miyako/4d-utility-sign-app)~~ [SIGN.4dm](/capture/test/Project/Sources/Methods/SIGN.4dm) on how to enable the plugin in 4D.
 
+It might work "out of the box" since R3. see [blog](https://blog.4d.com/webcam-support-in-web-areas/).
+
 # 4d-plugin-capture-v2
 Simple video capture based on [AVFoundation](https://developer.apple.com/av-foundation/).
 

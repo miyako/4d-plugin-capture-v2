@@ -144,10 +144,10 @@
 		"height": 762
 	},
 	"Sources/Methods/TEST.4dm": {
-		"left": 276,
-		"top": 190,
-		"width": 877,
-		"height": 637
+		"left": 264,
+		"top": 88,
+		"width": 825,
+		"height": 553
 	},
 	"Sources/Methods/TEST_v17.4dm": {
 		"left": 450,
@@ -169,14 +169,14 @@
 	},
 	"Sources/Forms/TEST/method.4dm": {
 		"left": 264,
-		"top": 214,
+		"top": 116,
 		"width": 902,
 		"height": 564
 	},
 	"Sources/Forms/TEST/ObjectMethods/Start recording.4dm": {
 		"left": 264,
-		"top": 186,
+		"top": 116,
 		"width": 902,
-		"height": 592
+		"height": 564
 	}
 }

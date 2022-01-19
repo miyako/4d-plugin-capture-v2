@@ -316,10 +316,8 @@ void addSublayer(addSublayerCtx *ctx) {
     }
     
 	if (device.length() == 0) {
-
 		videoDevice = [AVCaptureDevice defaultDeviceWithMediaType : AVMediaTypeVideo];
         self.deviceUniqueID = [videoDevice uniqueID];
-
 	}
 	else {
         self.deviceUniqueID = [NSString stringWithUTF8String : uniqueID];
@@ -338,7 +336,21 @@ void addSublayer(addSublayerCtx *ctx) {
                     if ([captureSession canAddOutput : videoOutput]) {
                         [captureSession addOutput : videoOutput];
 
+                        audioDevice = [AVCaptureDevice defaultDeviceWithMediaType : AVMediaTypeAudio];
+                        
+                        if(audioDevice) {
+                            
+                            audioInput = [AVCaptureDeviceInput deviceInputWithDevice:audioDevice error:nil];
+                            
+                            if(audioInput) {
+                                if ([captureSession canAddInput : audioInput]) {
+                                    [captureSession addInput : audioInput];
+                                }
+                            }
+                        }
+                        
                         imageOutput = [[AVCaptureStillImageOutput alloc]init];
+                        
                         if (imageOutput) {
 
                             if ([captureSession canAddOutput : imageOutput])

@@ -163,7 +163,10 @@ typedef enum {
     AVCaptureVideoDataOutput *videoOutput;
     AVCaptureVideoPreviewLayer *previewLayer;
     AVCaptureMovieFileOutput *fileOutput;
-        
+    
+    AVCaptureDevice *audioDevice;
+    AVCaptureDeviceInput *audioInput;
+    
     CGRect previewLayerFrame;
     NSView *superLayerView;
     

@@ -3,4 +3,70 @@
    uuid = "1F5ECBE0-2069-49C4-A366-D69B369344C3"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F04AF182-A82C-4789-A8ED-AFAAE719481A"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "4DPlugin-Capture.cpp"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1183"
+            endingLineNumber = "1183"
+            landmarkName = "capture_Start(params)"
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  uuid = "F04AF182-A82C-4789-A8ED-AFAAE719481A - 5e1f6fe89ea04ad"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "capture_Start(PluginBlock*)"
+                  moduleName = "Capture"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/miyako/Documents/GitHub/4d-plugin-capture-v2/capture/4DPlugin-Capture.cpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1223"
+                  endingLineNumber = "1223"
+                  offsetFromSymbolStart = "356">
+               </Location>
+               <Location
+                  uuid = "F04AF182-A82C-4789-A8ED-AFAAE719481A - 5e1f6fe89ea04ad"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "capture_Start(PluginBlock*)"
+                  moduleName = "Capture"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/miyako/Documents/GitHub/4d-plugin-capture-v2/capture/4DPlugin-Capture.cpp"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1223"
+                  endingLineNumber = "1223"
+                  offsetFromSymbolStart = "2964">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "5EB26EF8-8AE6-4D9C-96A7-BF995CDC6137"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "4DPlugin-Capture.cpp"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1097"
+            endingLineNumber = "1097"
+            landmarkName = "capture_Start(params)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

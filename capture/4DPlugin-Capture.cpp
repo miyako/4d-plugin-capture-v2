@@ -1272,8 +1272,8 @@ void capture_Request_permisson(PA_PluginParameters params) {
     if(mainBundle) {
       NSDictionary *infoDictionary = [mainBundle infoDictionary];
         if(infoDictionary) {
-//            NSString *cameraUsageDescription = [infoDictionary objectForKey:@"NSCameraUsageDescription"];
-//            if(cameraUsageDescription) {
+            NSString *cameraUsageDescription = [infoDictionary objectForKey:@"NSCameraUsageDescription"];
+            if(cameraUsageDescription) {
     
                 SecTaskRef sec = SecTaskCreateFromSelf(kCFAllocatorMalloc);
                 CFErrorRef err = nil;
@@ -1325,62 +1325,75 @@ void capture_Request_permisson(PA_PluginParameters params) {
                     ob_set_b(status, L"success", false);
                     ob_set_s(status, L"errorMessage", "com.apple.security.device.camera is missing in app entitlement");
                 }
-                
-            boolValue = (CFBooleanRef)SecTaskCopyValueForEntitlement(
-                                                                                  SecTaskCreateFromSelf(NULL), CFSTR("com.apple.security.device.microphone"), &err);
-            if(!err) {
-                
-                if(boolValue) {
-                    
-                    if(CFBooleanGetValue(boolValue)) {
-                        request_permission_t permission = requestPermission(AVMediaTypeAudio);
-                        switch (permission) {
-                                
-                            case request_permission_authorized:
-                                ob_set_b(status, L"success", true);
-                                break;
-                                
-                            case request_permission_denied:
-                                ob_set_b(status, L"success", false);
-                                ob_set_s(status, L"errorMessage", "permission denied");
-                                break;
-                                
-                            case request_permission_restricted:
-                                ob_set_b(status, L"success", false);
-                                ob_set_s(status, L"errorMessage", "permission restricted");
-                                break;
                             
-                            case request_permission_not_determined:
-                                ob_set_b(status, L"success", false);
-                                ob_set_s(status, L"errorMessage", "permission not determined");
-                                break;
+                CFRelease(sec);
+  
+            }else{
+                ob_set_b(status, L"success", false);
+                ob_set_s(status, L"errorMessage", "NSCameraUsageDescription is missing in app info.plist");
+            }
+            
+            NSString *microphoneUsageDescription = [infoDictionary objectForKey:@"NSMicrophoneUsageDescription"];
+            if(microphoneUsageDescription) {
+                
+                SecTaskRef sec = SecTaskCreateFromSelf(kCFAllocatorMalloc);
+                CFErrorRef err = nil;
+                CFBooleanRef boolValue = (CFBooleanRef)SecTaskCopyValueForEntitlement(
+                                                                                      SecTaskCreateFromSelf(NULL), CFSTR("com.apple.security.device.microphone"), &err);
+                if(!err) {
+                    
+                    if(boolValue) {
+                        
+                        if(CFBooleanGetValue(boolValue)) {
+                            request_permission_t permission = requestPermission(AVMediaTypeAudio);
+                            switch (permission) {
+                                    
+                                case request_permission_authorized:
+                                    ob_set_b(status, L"success", true);
+                                    break;
+                                    
+                                case request_permission_denied:
+                                    ob_set_b(status, L"success", false);
+                                    ob_set_s(status, L"errorMessage", "permission denied");
+                                    break;
+                                    
+                                case request_permission_restricted:
+                                    ob_set_b(status, L"success", false);
+                                    ob_set_s(status, L"errorMessage", "permission restricted");
+                                    break;
                                 
-                            default:
-                                break;
+                                case request_permission_not_determined:
+                                    ob_set_b(status, L"success", false);
+                                    ob_set_s(status, L"errorMessage", "permission not determined");
+                                    break;
+                                    
+                                default:
+                                    break;
+                            }
                         }
+                        
+                        if(request_permission_granted) {
+                            ob_set_b(status, L"success", true);
+                        }
+                        
+                        CFRelease(boolValue);
+                    }else{
+                        ob_set_b(status, L"success", false);
+                        ob_set_s(status, L"errorMessage", "com.apple.security.device.microphone is set to false in app entitlement");
                     }
                     
-                    if(request_permission_granted) {
-                        ob_set_b(status, L"success", true);
-                    }
-                    
-                    CFRelease(boolValue);
                 }else{
                     ob_set_b(status, L"success", false);
-                    ob_set_s(status, L"errorMessage", "com.apple.security.device.microphone is set to false in app entitlement");
+                    ob_set_s(status, L"errorMessage", "com.apple.security.device.microphone is missing in app entitlement");
                 }
+                
+                CFRelease(sec);
                 
             }else{
                 ob_set_b(status, L"success", false);
-                ob_set_s(status, L"errorMessage", "com.apple.security.device.microphone is missing in app entitlement");
+                ob_set_s(status, L"errorMessage", "microphoneUsageDescription is missing in app info.plist");
             }
-            
-                CFRelease(sec);
-  
-//            }else{
-//                ob_set_b(status, L"success", false);
-//                ob_set_s(status, L"errorMessage", "NSCameraUsageDescription is missing in app info.plist");
-//            }
+
         }else{
             ob_set_b(status, L"success", false);
             ob_set_s(status, L"errorMessage", "failed to locate [mainBundle infoDictionary]");

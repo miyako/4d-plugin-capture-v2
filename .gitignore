@@ -1,3 +1,3 @@
-capture/build/*
-capture/test/Data/*
-capture/test/userPreferences.*
+build/*
+test/Data/*
+test/userPreferences.*

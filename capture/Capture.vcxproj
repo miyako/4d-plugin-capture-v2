@@ -25,6 +25,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="support\4DPlugin-JSON.cpp" />
     <ClCompile Include="4DPlugin-Capture.cpp" />
   </ItemGroup>
   <ItemGroup>

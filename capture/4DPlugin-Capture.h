@@ -27,33 +27,8 @@
 #include <d3d9.h>
 #include <vmr9.h>
 
-class ComInitClass {
-    
-private:
-    
-    bool _comReady;
-    
-public:
-    
-    ComInitClass() {
-        //COINIT_MULTITHREADED will fail in 4D plugin
-        if (SUCCEEDED(CoInitializeEx(NULL, COINIT_APARTMENTTHREADED))) {
-            _comReady = true;
-        }
-    }
-    
-    ~ComInitClass() {
-        CoUninitialize();
-    }
-    
-public:
-    
-    bool isComReady() {
-        
-        return _comReady;
-        
-    }
-};
+/* COM is initialized per thread; call before any COM use on the current thread */
+bool com_ready();
 
 class CaptureMan : public IUnknown
 {
@@ -138,6 +113,7 @@ public:
 #import <CoreMedia/CoreMedia.h>
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/CALayer.h>
+#include <atomic>
 
 //#ifndef errAEEventWouldRequireUserConsent
 //enum {
@@ -174,8 +150,11 @@ typedef enum {
     
     std::vector<unsigned char>buf;
     
-    bool imageCaptured;
+    std::atomic<bool> imageCaptured; /* set on a capture queue, polled by capture Image */
     bool isConfigured;
+
+    NSMutableDictionary *outputSettings;
+    NSMutableDictionary *compressionProperties;
     
     NSNotificationCenter *notificationCenter;
 }

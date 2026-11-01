@@ -15,22 +15,22 @@
         {
             "theme": "capture",
             "syntax": "capture Stop",
-            "threadSafe": true
+            "threadSafe": false
         },
         {
             "theme": "capture",
             "syntax": "capture Image:P",
-            "threadSafe": true
+            "threadSafe": false
         },
         {
             "theme": "capture",
             "syntax": "capture Update(&J)",
-            "threadSafe": true
+            "threadSafe": false
         },
         {
             "theme": "capture",
             "syntax": "capture Start recording(&J)",
-            "threadSafe": true
+            "threadSafe": false
         },
         {
             "theme": "capture",
@@ -40,12 +40,12 @@
         {
             "theme": "capture",
             "syntax": "capture Pause recording",
-            "threadSafe": true
+            "threadSafe": false
         },
         {
             "theme": "capture",
             "syntax": "capture Resume recording",
-            "threadSafe": true
+            "threadSafe": false
         },
         {
             "theme": "capture",

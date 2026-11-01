@@ -4,6 +4,7 @@
     <ClCompile Include="4D Plugin API\4DPluginAPI.c">
       <Filter>4D Plugin API</Filter>
     </ClCompile>
+    <ClCompile Include="support\4DPlugin-JSON.cpp" />
     <ClCompile Include="4DPlugin-Capture.cpp" />
   </ItemGroup>
   <ItemGroup>

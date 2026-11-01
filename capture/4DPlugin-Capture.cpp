@@ -12,10 +12,71 @@
 
 #define USE_VMR9	0
 
+#define CAPTURE_IMAGE_TIMEOUT 10.0 /* seconds */
+
+#include <cmath>
+#include <cstdint>
+
+#if VERSIONMAC
+/* Json::Value::asInt() throws Json::LogicError outside the int range; read as double and clamp */
+static double json_get_double(const Json::Value &value) {
+
+    double d = value.asDouble();
+
+    return std::isfinite(d) ? d : 0;
+}
+
+static int64_t json_get_int64(const Json::Value &value) {
+
+    double d = json_get_double(value);
+
+    if (d <= 0) return 0;
+    if (d >= 9.2e18) return INT64_MAX;
+
+    return (int64_t)d;
+}
+#endif
+
 bool request_permission_granted = false;
 
 #if VERSIONWIN
-ComInitClass g_ComInitClass;
+/* ob_get_a returns UTF-8 (CUTF8String); DirectShow wants UTF-16 */
+static bool ob_get_w(PA_ObjectRef obj, const wchar_t *key, std::wstring *value) {
+
+    CUTF8String u8;
+
+    if (!ob_get_a(obj, key, &u8)) return false;
+
+    value->clear();
+
+    if (u8.length()) {
+        int len = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)u8.c_str(), (int)u8.length(), NULL, 0);
+        if (len) {
+            value->resize(len);
+            MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)u8.c_str(), (int)u8.length(), &(*value)[0], len);
+        }
+    }
+
+    return true;
+}
+
+/*
+ COM is per thread: initialize lazily on whichever thread calls, not at DLL load
+ (static initialization runs under the loader lock, and only on the loading thread).
+ COINIT_MULTITHREADED will fail in 4D plugin; RPC_E_CHANGED_MODE means COM is already
+ initialized on this thread in another mode, which is still usable.
+ There is no matching CoUninitialize: the DirectShow objects live as long as the plugin,
+ and calling it at thread exit would also run under the loader lock.
+*/
+bool com_ready() {
+
+    thread_local bool ready = [] {
+        HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+        return (SUCCEEDED(hr)) || (hr == RPC_E_CHANGED_MODE);
+    }();
+
+    return ready;
+}
 CaptureMan *captureMan = NULL;
 #endif
 
@@ -74,100 +135,85 @@ void addSublayer(addSublayerCtx *ctx) {
     }
 }
 
+/* setOutputSettings: replaces the whole dictionary; accumulate every option and apply them together */
+-(void)applyOutputSettings
+{
+    if (isConfigured) {
+        
+        /* must be a connection of fileOutput, not of imageOutput */
+        AVCaptureConnection *connection = [fileOutput connectionWithMediaType : AVMediaTypeVideo];
+        
+        if (connection) {
+            
+            NSMutableDictionary *settings = [NSMutableDictionary dictionaryWithDictionary:outputSettings];
+            
+            if ([compressionProperties count]) {
+                [settings setObject:compressionProperties forKey:AVVideoCompressionPropertiesKey];
+            }
+            
+            @try {
+                [fileOutput setOutputSettings:settings forConnection:connection];
+            }
+            @catch (NSException *exception) {
+                /* invalid key or value; runs in the main process, an exception must not reach 4D */
+            }
+        }
+    }
+}
+
 -(void)setVideoQuality:(double)videoQuality
 {
     if (isConfigured) {
-
-        NSDictionary *outputSettings = [NSDictionary
-                                        dictionaryWithObject:[NSDictionary
-                                                              dictionaryWithObject:[NSNumber numberWithDouble:videoQuality]
-                                                              forKey:AVVideoQualityKey]
-                                        forKey:AVVideoCompressionPropertiesKey];
-
-        AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
-        [fileOutput setOutputSettings:outputSettings forConnection:connection];
+        [compressionProperties setObject:[NSNumber numberWithDouble:videoQuality] forKey:AVVideoQualityKey];
+        [self applyOutputSettings];
     }
 }
 
 -(void)setMaxKeyFrameIntervalDuration:(double)intervalDuration
 {
     if (isConfigured) {
-        
-        NSDictionary *outputSettings = [NSDictionary
-                                        dictionaryWithObject:[NSDictionary
-                                                              dictionaryWithObject:[NSNumber numberWithDouble:intervalDuration]
-                                                              forKey:AVVideoMaxKeyFrameIntervalDurationKey]
-                                        forKey:AVVideoCompressionPropertiesKey];
-        
-        AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
-        [fileOutput setOutputSettings:outputSettings forConnection:connection];
+        [compressionProperties setObject:[NSNumber numberWithDouble:intervalDuration] forKey:AVVideoMaxKeyFrameIntervalDurationKey];
+        [self applyOutputSettings];
     }
 }
 
 -(void)setMaxKeyFrameInterval:(NSUInteger)keyFrameInterval
 {
     if (isConfigured) {
-        
-        NSDictionary *outputSettings = [NSDictionary
-                                        dictionaryWithObject:[NSDictionary
-                                                              dictionaryWithObject:[NSNumber numberWithUnsignedInteger:keyFrameInterval]
-                                                              forKey:AVVideoMaxKeyFrameIntervalKey]
-                                        forKey:AVVideoCompressionPropertiesKey];
-        
-        AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
-        [fileOutput setOutputSettings:outputSettings forConnection:connection];
+        [compressionProperties setObject:[NSNumber numberWithUnsignedInteger:keyFrameInterval] forKey:AVVideoMaxKeyFrameIntervalKey];
+        [self applyOutputSettings];
     }
 }
 
 -(void)setAverageBitRate:(NSUInteger)averageBitRate
 {
     if (isConfigured) {
-        
-        NSDictionary *outputSettings = [NSDictionary
-                                        dictionaryWithObject:[NSDictionary
-                                                              dictionaryWithObject:[NSNumber numberWithUnsignedInteger:averageBitRate]
-                                                              forKey:AVVideoAverageBitRateKey]
-                                        forKey:AVVideoCompressionPropertiesKey];
-        
-        AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
-        [fileOutput setOutputSettings:outputSettings forConnection:connection];
+        [compressionProperties setObject:[NSNumber numberWithUnsignedInteger:averageBitRate] forKey:AVVideoAverageBitRateKey];
+        [self applyOutputSettings];
     }
 }
 
 -(void)setVideoCodec:(AVVideoCodecType)videoCodec
 {
     if (isConfigured) {
-        
-        NSDictionary *outputSettings = [NSDictionary dictionaryWithObject:videoCodec forKey:AVVideoCodecKey];
-        
-        AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
-        [fileOutput setOutputSettings:outputSettings forConnection:connection];
+        [outputSettings setObject:videoCodec forKey:AVVideoCodecKey];
+        [self applyOutputSettings];
     }
 }
 
 -(void)setVideoHeight:(NSUInteger)height
 {
     if (isConfigured) {
-        
-        NSDictionary *outputSettings = [NSDictionary
-                                        dictionaryWithObject:[NSNumber numberWithUnsignedInteger:height]
-                                        forKey:AVVideoHeightKey];
-        
-        AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
-        [fileOutput setOutputSettings:outputSettings forConnection:connection];
+        [outputSettings setObject:[NSNumber numberWithUnsignedInteger:height] forKey:AVVideoHeightKey];
+        [self applyOutputSettings];
     }
 }
 
 -(void)setVideoWidth:(NSUInteger)width
 {
     if (isConfigured) {
-        
-        NSDictionary *outputSettings = [NSDictionary
-                                        dictionaryWithObject:[NSNumber numberWithUnsignedInteger:width]
-                                        forKey:AVVideoWidthKey];
-        
-        AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
-        [fileOutput setOutputSettings:outputSettings forConnection:connection];
+        [outputSettings setObject:[NSNumber numberWithUnsignedInteger:width] forKey:AVVideoWidthKey];
+        [self applyOutputSettings];
     }
 }
 
@@ -306,6 +352,9 @@ void addSublayer(addSublayerCtx *ctx) {
 	NSError *error = nil;
         
 	captureSession = [[AVCaptureSession alloc]init];
+
+	outputSettings = [[NSMutableDictionary alloc]init];
+	compressionProperties = [[NSMutableDictionary alloc]init];
 
 	[captureSession beginConfiguration];
 
@@ -523,25 +572,32 @@ didResumeRecordingToOutputFileAtURL : (NSURL *)fileURL
 {
 	if (isConfigured) {
 
-		if ([captureSession isRunning]) {
+		AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
 
-			AVCaptureConnection *connection = [imageOutput connectionWithMediaType : AVMediaTypeVideo];
+		/* an inactive or disabled connection (e.g. camera unplugged) raises NSInvalidArgumentException */
+		if (([captureSession isRunning]) && (connection) && ([connection isActive]) && ([connection isEnabled])) {
 
-			[imageOutput captureStillImageAsynchronouslyFromConnection : connection
-				completionHandler : ^ (CMSampleBufferRef imageDataSampleBuffer, NSError *error)
-			{
-
-				if (!error)
+			@try {
+				[imageOutput captureStillImageAsynchronouslyFromConnection : connection
+					completionHandler : ^ (CMSampleBufferRef imageDataSampleBuffer, NSError *error)
 				{
-					NSData *data = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation : imageDataSampleBuffer];
-					if (data) {
-						buf.resize([data length]);
-						[data getBytes : &buf[0] length : [data length]];
-					}
-				}
 
+					if ((!error) && (imageDataSampleBuffer))
+					{
+						NSData *data = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation : imageDataSampleBuffer];
+						if ((data) && ([data length])) {
+							buf.resize([data length]);
+							[data getBytes : &buf[0] length : [data length]];
+						}
+					}
+
+					imageCaptured = true;
+				}];
+			}
+			@catch (NSException *exception) {
+				/* this runs on a background thread; an uncaught exception would abort 4D */
 				imageCaptured = true;
-			}];
+			}
 		}
 		else {
 			imageCaptured = true;
@@ -567,6 +623,9 @@ didResumeRecordingToOutputFileAtURL : (NSURL *)fileURL
 	}
 
 	[captureSession release];
+
+	[outputSettings release];
+	[compressionProperties release];
 
 	[super dealloc];
 }
@@ -693,15 +752,25 @@ void capture_Image(PA_PluginParameters params) {
 	if (request_permission_granted) {
 		if (captureMan)
 		{
-			[captureMan prepareForCaptureImage];
-			[captureMan performSelectorInBackground : @selector(captureImage) withObject:nil];
+			/* other processes run during PA_YieldAbsolute and may replace captureMan; keep our own reference */
+			CaptureMan *man = [captureMan retain];
 
-			do {
+			[man prepareForCaptureImage];
+			[man performSelectorInBackground : @selector(captureImage) withObject:nil];
+
+			/* the completion handler is not guaranteed to be called; never wait forever */
+			CFAbsoluteTime deadline = CFAbsoluteTimeGetCurrent() + CAPTURE_IMAGE_TIMEOUT;
+
+			while ((![man isImageReady]) && (CFAbsoluteTimeGetCurrent() < deadline)) {
 				PA_YieldAbsolute();
-			} while (![captureMan isImageReady]);
+			}
 
-			PA_Picture p = [captureMan copyImage];
-			PA_ReturnPicture(params, p);
+			if ([man isImageReady]) {
+				PA_Picture p = [man copyImage];
+				PA_ReturnPicture(params, p);
+			}
+
+			[man release];
 		}
 	}
 #else
@@ -714,6 +783,8 @@ void capture_Image(PA_PluginParameters params) {
 #endif
 }
 
+#if VERSIONMAC
+/* runs in the main process via PA_RunInMainProcess */
 static void _capture_Stop(Json::Value *value) {
     
     Json::Value options = *value;
@@ -721,6 +792,7 @@ static void _capture_Stop(Json::Value *value) {
     [captureMan performSelectorInBackground:@selector(stopRunning) withObject:nil];
 
 }
+#endif
 void capture_Stop(PA_PluginParameters params) {
  
 #if VERSIONMAC
@@ -740,6 +812,8 @@ void capture_Stop(PA_PluginParameters params) {
 #endif
 }
 
+#if VERSIONMAC
+/* runs in the main process via PA_RunInMainProcess */
 static void _capture_Update(Json::Value *value) {
         
     Json::Value options = *value;
@@ -761,6 +835,7 @@ static void _capture_Update(Json::Value *value) {
     
     [captureMan updatePreviewLayerFrame:rect flipH:flipH flipV:flipV hidden:hidden];
 }
+#endif
 void capture_Update(PA_PluginParameters params) {
 
 #if VERSIONMAC
@@ -817,22 +892,14 @@ void capture_Update(PA_PluginParameters params) {
 #endif
 }
 
+#if VERSIONMAC
+/* runs in the main process via PA_RunInMainProcess */
 static void _capture_Start_recording(Json::Value *value) {
     
     Json::Value options = *value;
     
     NSString *str = [[NSString alloc]initWithUTF8String:options["path"].asString().c_str()];
-    
-    CMTime maxRecordedDuration = kCMTimeInvalid;
-    
-    if(options.isMember("maxRecordedDuration"))
-        maxRecordedDuration = CMTimeMakeWithSeconds(options["maxRecordedDuration"].asInt(), 1);
-    
-    int64_t maxRecordedFileSize = 0;
-    
-    if(options.isMember("maxRecordedFileSize"))
-        maxRecordedFileSize = options["maxRecordedFileSize"].asInt();
-    
+
     if(str) {
         NSURL *url = (NSURL *)CFURLCreateWithFileSystemPath(kCFAllocatorDefault, (CFStringRef)str, kCFURLHFSPathStyle, false);
         [captureMan performSelectorInBackground:@selector(startRecording:) withObject:url];
@@ -841,6 +908,7 @@ static void _capture_Start_recording(Json::Value *value) {
     }
     
 }
+#endif
 void capture_Start_recording(PA_PluginParameters params) {
     
 #if VERSIONMAC
@@ -853,7 +921,7 @@ void capture_Start_recording(PA_PluginParameters params) {
             std::string path;
             CUTF8String _path;
             
-            if(ob_get_s(param, L"file", &_path)) {
+            if(ob_get_a(param, L"file", &_path)) {
                 path = (const char *)_path.c_str();
             }
             
@@ -877,6 +945,8 @@ void capture_Start_recording(PA_PluginParameters params) {
 #endif
 }
 
+#if VERSIONMAC
+/* runs in the main process via PA_RunInMainProcess */
 static void _capture_Pause_recording(Json::Value *value) {
     
     Json::Value options = *value;
@@ -884,6 +954,7 @@ static void _capture_Pause_recording(Json::Value *value) {
     [captureMan performSelectorInBackground:@selector(pauseRecording) withObject:nil];
     
 }
+#endif
 void capture_Pause_recording(PA_PluginParameters params) {
     
 #if VERSIONMAC
@@ -898,6 +969,8 @@ void capture_Pause_recording(PA_PluginParameters params) {
 #endif
 }
 
+#if VERSIONMAC
+/* runs in the main process via PA_RunInMainProcess */
 static void _capture_Resume_recording(Json::Value *value) {
     
     Json::Value options = *value;
@@ -905,6 +978,7 @@ static void _capture_Resume_recording(Json::Value *value) {
     [captureMan performSelectorInBackground:@selector(resumeRecording) withObject:nil];
     
 }
+#endif
 void capture_Resume_recording(PA_PluginParameters params) {
     
 #if VERSIONMAC
@@ -919,6 +993,8 @@ void capture_Resume_recording(PA_PluginParameters params) {
 #endif
 }
 
+#if VERSIONMAC
+/* runs in the main process via PA_RunInMainProcess */
 static void _capture_Stop_recording(Json::Value *value) {
     
     Json::Value options = *value;
@@ -926,6 +1002,7 @@ static void _capture_Stop_recording(Json::Value *value) {
     [captureMan performSelectorInBackground:@selector(stopRecording) withObject:nil];
 
 }
+#endif
 void capture_Stop_recording(PA_PluginParameters params) {
 
 #if VERSIONMAC
@@ -941,6 +1018,8 @@ void capture_Stop_recording(PA_PluginParameters params) {
 #endif
 }
 
+#if VERSIONMAC
+/* runs in the main process via PA_RunInMainProcess */
 static void _capture_Start(Json::Value *value) {
     
     Json::Value options = *value;
@@ -1044,33 +1123,36 @@ static void _capture_Start(Json::Value *value) {
             [captureMan setSessionPreset:sessionPreset];
         }
 
+        /* asInt() throws Json::LogicError outside the int range (JSON_USE_EXCEPTION is 1) */
+
         if(options.isMember("quality"))
-            [captureMan setVideoQuality:options["quality"].asInt()];
-        
+            [captureMan setVideoQuality:json_get_double(options["quality"])];
+
         if(options.isMember("averageBitRate"))
-            [captureMan setAverageBitRate:options["averageBitRate"].asInt()];
-        
+            [captureMan setAverageBitRate:(NSUInteger)json_get_int64(options["averageBitRate"])];
+
         if(options.isMember("maxKeyFrameInterval"))
-            [captureMan setMaxKeyFrameInterval:options["maxKeyFrameInterval"].asInt()];
-        
+            [captureMan setMaxKeyFrameInterval:(NSUInteger)json_get_int64(options["maxKeyFrameInterval"])];
+
         if(options.isMember("maxKeyFrameIntervalDuration"))
-            [captureMan setMaxKeyFrameIntervalDuration:options["maxKeyFrameIntervalDuration"].asInt()];
-        
+            [captureMan setMaxKeyFrameIntervalDuration:json_get_double(options["maxKeyFrameIntervalDuration"])];
+
         if(options.isMember("videoWidth"))
-            [captureMan setVideoWidth:options["videoWidth"].asInt()];
-        
+            [captureMan setVideoWidth:(NSUInteger)json_get_int64(options["videoWidth"])];
+
         if(options.isMember("videoHeight"))
-            [captureMan setVideoHeight:options["videoHeight"].asInt()];
-        
+            [captureMan setVideoHeight:(NSUInteger)json_get_int64(options["videoHeight"])];
+
         if(options.isMember("maxRecordedDuration"))
-            [captureMan setMaxRecordedDuration:options["maxRecordedDuration"].asInt()];
-        
+            [captureMan setMaxRecordedDuration:json_get_int64(options["maxRecordedDuration"])];
+
         if(options.isMember("maxRecordedFileSize"))
-            [captureMan setMaxRecordedFileSize:options["maxRecordedFileSize"].asInt()];
+            [captureMan setMaxRecordedFileSize:json_get_int64(options["maxRecordedFileSize"])];
         
         [captureMan performSelectorInBackground:@selector(startRunning) withObject:nil];
     }
 }
+#endif
 void capture_Start(PA_PluginParameters params) {
     
 #if VERSIONMAC
@@ -1094,21 +1176,21 @@ void capture_Start(PA_PluginParameters params) {
             std::string uniqueID;
             CUTF8String _uniqueID;
             
-            if(ob_get_s(param, L"device", &_uniqueID)) {
+            if(ob_get_a(param, L"device", &_uniqueID)) {
                 uniqueID = (const char *)_uniqueID.c_str();
             }
             
             std::string codec;
             CUTF8String _codec;
             
-            if(ob_get_s(param, L"videoCodec", &_codec)) {
+            if(ob_get_a(param, L"videoCodec", &_codec)) {
                 codec = (const char *)_codec.c_str();
             }
             
             std::string preset;
             CUTF8String _preset;
             
-            if(ob_get_s(param, L"preset", &_preset)) {
+            if(ob_get_a(param, L"preset", &_preset)) {
                 preset = (const char *)_preset.c_str();
             }
             
@@ -1165,9 +1247,9 @@ void capture_Start(PA_PluginParameters params) {
     }
 #else
     PA_ObjectRef param = PA_GetObjectParameter(params, 1);
-    
-    if(param) {
-        
+
+    if((param) && (com_ready())) {
+
         PA_long32 w = (PA_long32)ob_get_n(param, L"window");
 
 		PA_long32 x = (PA_long32)ob_get_n(param, L"x");
@@ -1178,17 +1260,17 @@ void capture_Start(PA_PluginParameters params) {
         bool force = ob_get_b(param, L"force");
         
         const wchar_t *uniqueID = NULL;
-        CUTF16String _uniqueID;
+        std::wstring _uniqueID;
         
-        if(ob_get_a(param, L"device", &_uniqueID)) {
-            uniqueID = (const wchar_t *)_uniqueID.c_str();
+        if(ob_get_w(param, L"device", &_uniqueID)) {
+            uniqueID = _uniqueID.c_str();
         }
 
 		const wchar_t *file = NULL;
-		CUTF16String _file;
+		std::wstring _file;
 
-		if (ob_get_a(param, L"file", &_file)) {
-			file = (const wchar_t *)_file.c_str();
+		if (ob_get_w(param, L"file", &_file)) {
+			file = _file.c_str();
 		}
 
 		if (!captureMan)
@@ -1442,7 +1524,7 @@ void capture_Devices(PA_PluginParameters params) {
         
     }];
 #else
-    if(g_ComInitClass.isComReady()) {
+    if(com_ready()) {
         
         ICreateDevEnum *pDevEnum = NULL;
         HRESULT hr = CoCreateInstance(CLSID_SystemDeviceEnum,
@@ -1455,7 +1537,7 @@ void capture_Devices(PA_PluginParameters params) {
             IEnumMoniker *pEnum = NULL;
             hr = pDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, &pEnum, 0);
             
-            if (hr != S_FALSE)
+            if (hr == S_OK) /* S_FALSE: category is empty, pEnum is NULL; FAILED: pEnum is NULL */
             {
                 IMoniker *pMoniker = NULL;
                 while (pEnum->Next(1, &pMoniker, NULL) == S_OK)
@@ -1664,7 +1746,7 @@ IBaseFilter *capture_getDeviceForName(const wchar_t *n, std::wstring &devicePath
 		IEnumMoniker *pEnum = NULL;
 		hr = pDevEnum->CreateClassEnumerator(CLSID_VideoInputDeviceCategory, &pEnum, 0);
 
-		if (hr != S_FALSE)
+		if (hr == S_OK) /* S_FALSE: category is empty, pEnum is NULL; FAILED: pEnum is NULL */
 		{
 			IMoniker *pMoniker = NULL;
 			while ((pEnum->Next(1, &pMoniker, NULL) == S_OK) && !(pBFilter))

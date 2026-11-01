@@ -97,6 +97,12 @@ void addSublayer(addSublayerCtx *ctx) {
 @implementation CaptureMan
 - (PA_Picture)copyImage
 {
+	if (buf.empty()) {
+		/* &buf[0] on an empty vector is undefined */
+		char _buf[1];
+		return PA_CreatePicture(_buf, 0);
+	}
+
 	return PA_CreatePicture((void *)&buf[0], (PA_long32)buf.size());
 }
 
@@ -429,8 +435,6 @@ void addSublayer(addSublayerCtx *ctx) {
             }
         }
 
-        [captureSession commitConfiguration];
-
         notificationCenter = [NSNotificationCenter defaultCenter];
 
         if (@available(macOS 10.14, *)) {
@@ -438,32 +442,32 @@ void addSublayer(addSublayerCtx *ctx) {
             addObserver : self
             selector : @selector(onInterrupted : )
                        name:AVCaptureSessionWasInterruptedNotification
-            object : nil];
+            object : captureSession];
 
         [notificationCenter
             addObserver : self
             selector : @selector(onSessionInterruptionEnded : )
                        name:AVCaptureSessionInterruptionEndedNotification
-            object : nil];
+            object : captureSession];
         }
 
         [notificationCenter
             addObserver : self
             selector : @selector(onSessionRuntimeError : )
                        name:AVCaptureSessionRuntimeErrorNotification
-            object : nil];
+            object : captureSession];
 
         [notificationCenter
             addObserver : self
             selector : @selector(onStartRunning : )
                        name:AVCaptureSessionDidStartRunningNotification
-            object : nil];
+            object : captureSession];
 
         [notificationCenter
             addObserver : self
             selector : @selector(onStopRunning : )
                        name:AVCaptureSessionDidStopRunningNotification
-            object : nil];
+            object : captureSession];
 
         [notificationCenter
             addObserver : self
@@ -477,6 +481,9 @@ void addSublayer(addSublayerCtx *ctx) {
                        name:AVCaptureDeviceWasDisconnectedNotification
             object : nil];
     }
+
+	/* balance beginConfiguration even when there is no camera */
+	[captureSession commitConfiguration];
 
 	return self;
 }
@@ -612,17 +619,35 @@ didResumeRecordingToOutputFileAtURL : (NSURL *)fileURL
 {
 	[notificationCenter removeObserver : self];
 
-	if (isConfigured) {
+	if ([fileOutput isRecording])[fileOutput stopRecording];
 
-		if ([fileOutput isRecording])[fileOutput stopRecording];
-
-		[previewLayer release];
-		[videoOutput release];
-		[imageOutput release];
-		[fileOutput release];
+	/* the 4D window's layer retains previewLayer, which retains captureSession: detach it, or the session keeps the camera running */
+	if (previewLayer) {
+		AVCaptureVideoPreviewLayer *layer = previewLayer;/* released by the block */
+		void (^detach)(void) = ^{
+			[layer setSession : nil];
+			[layer removeFromSuperlayer];
+			[layer release];
+		};
+		if ([NSThread isMainThread]) {
+			detach();
+		}
+		else {
+			/* the last release may come from a performSelectorInBackground thread */
+			dispatch_async(dispatch_get_main_queue(), detach);
+		}
 	}
 
+	[captureSession stopRunning];
+
+	/* allocated before isConfigured is set; release even when configuration failed */
+	[videoOutput release];
+	[imageOutput release];
+	[fileOutput release];
+
 	[captureSession release];
+
+	self.deviceUniqueID = nil;
 
 	[outputSettings release];
 	[compressionProperties release];
@@ -1281,7 +1306,7 @@ void capture_Start(PA_PluginParameters params) {
 		}
 		else
 		{
-			if ((w) && (captureMan->isWindowRef(w))) {
+			if ((w) && (!captureMan->isWindowRef(w))) {
                 force = true;/* window changed; force */
             } else if ((uniqueID) && !(captureMan->isDeviceUniqueID(uniqueID))) {
                 force = true;/* uniqueID changed; force */
@@ -1357,10 +1382,10 @@ void capture_Request_permisson(PA_PluginParameters params) {
             NSString *cameraUsageDescription = [infoDictionary objectForKey:@"NSCameraUsageDescription"];
             if(cameraUsageDescription) {
     
-                SecTaskRef sec = SecTaskCreateFromSelf(kCFAllocatorMalloc);
+                SecTaskRef sec = SecTaskCreateFromSelf(kCFAllocatorDefault);
                 CFErrorRef err = nil;
-                CFBooleanRef boolValue = (CFBooleanRef)SecTaskCopyValueForEntitlement(
-                                                                                      SecTaskCreateFromSelf(NULL), CFSTR("com.apple.security.device.camera"), &err);
+                CFTypeRef value = sec ? SecTaskCopyValueForEntitlement(sec, CFSTR("com.apple.security.device.camera"), &err) : NULL;
+                CFBooleanRef boolValue = ((value) && (CFGetTypeID(value) == CFBooleanGetTypeID())) ? (CFBooleanRef)value : NULL;
                 if(!err) {
                     
                     if(boolValue) {
@@ -1391,24 +1416,28 @@ void capture_Request_permisson(PA_PluginParameters params) {
                                 default:
                                     break;
                             }
+                        }else{
+                            ob_set_b(status, L"success", false);
+                            ob_set_s(status, L"errorMessage", "com.apple.security.device.camera is set to false in app entitlement");
                         }
                         
                         if(request_permission_granted) {
                             ob_set_b(status, L"success", true);
                         }
                         
-                        CFRelease(boolValue);
                     }else{
                         ob_set_b(status, L"success", false);
-                        ob_set_s(status, L"errorMessage", "com.apple.security.device.camera is set to false in app entitlement");
+                        ob_set_s(status, L"errorMessage", "com.apple.security.device.camera is missing in app entitlement");
                     }
                     
                 }else{
                     ob_set_b(status, L"success", false);
-                    ob_set_s(status, L"errorMessage", "com.apple.security.device.camera is missing in app entitlement");
+                    ob_set_s(status, L"errorMessage", "com.apple.security.device.camera could not be read from app entitlement");
                 }
                             
-                CFRelease(sec);
+                if(value) CFRelease(value);
+                if(err) CFRelease(err);
+                if(sec) CFRelease(sec);
   
             }else{
                 ob_set_b(status, L"success", false);
@@ -1418,10 +1447,10 @@ void capture_Request_permisson(PA_PluginParameters params) {
             NSString *microphoneUsageDescription = [infoDictionary objectForKey:@"NSMicrophoneUsageDescription"];
             if(microphoneUsageDescription) {
                 
-                SecTaskRef sec = SecTaskCreateFromSelf(kCFAllocatorMalloc);
+                SecTaskRef sec = SecTaskCreateFromSelf(kCFAllocatorDefault);
                 CFErrorRef err = nil;
-                CFBooleanRef boolValue = (CFBooleanRef)SecTaskCopyValueForEntitlement(
-                                                                                      SecTaskCreateFromSelf(NULL), CFSTR("com.apple.security.device.microphone"), &err);
+                CFTypeRef value = sec ? SecTaskCopyValueForEntitlement(sec, CFSTR("com.apple.security.device.microphone"), &err) : NULL;
+                CFBooleanRef boolValue = ((value) && (CFGetTypeID(value) == CFBooleanGetTypeID())) ? (CFBooleanRef)value : NULL;
                 if(!err) {
                     
                     if(boolValue) {
@@ -1452,24 +1481,28 @@ void capture_Request_permisson(PA_PluginParameters params) {
                                 default:
                                     break;
                             }
+                        }else{
+                            ob_set_b(status, L"success", false);
+                            ob_set_s(status, L"errorMessage", "com.apple.security.device.microphone is set to false in app entitlement");
                         }
                         
                         if(request_permission_granted) {
                             ob_set_b(status, L"success", true);
                         }
                         
-                        CFRelease(boolValue);
                     }else{
                         ob_set_b(status, L"success", false);
-                        ob_set_s(status, L"errorMessage", "com.apple.security.device.microphone is set to false in app entitlement");
+                        ob_set_s(status, L"errorMessage", "com.apple.security.device.microphone is missing in app entitlement");
                     }
                     
                 }else{
                     ob_set_b(status, L"success", false);
-                    ob_set_s(status, L"errorMessage", "com.apple.security.device.microphone is missing in app entitlement");
+                    ob_set_s(status, L"errorMessage", "com.apple.security.device.microphone could not be read from app entitlement");
                 }
                 
-                CFRelease(sec);
+                if(value) CFRelease(value);
+                if(err) CFRelease(err);
+                if(sec) CFRelease(sec);
                 
             }else{
                 ob_set_b(status, L"success", false);
@@ -1559,7 +1592,7 @@ void capture_Devices(PA_PluginParameters params) {
                     hr = pPropBag->Read(L"FriendlyName", &var, 0);
                     if (SUCCEEDED(hr))
                     {
-                        ob_set_a(o, L"friendlyName", (const wchar_t *)var.bstrVal);
+                        if (var.vt == VT_BSTR) ob_set_a(o, L"friendlyName", (const wchar_t *)var.bstrVal);
                         VariantClear(&var);
                     }
 
@@ -1567,7 +1600,7 @@ void capture_Devices(PA_PluginParameters params) {
                     hr = pPropBag->Read(L"Description", &var, 0);
                     if (SUCCEEDED(hr))
                     {
-                        ob_set_a(o, L"description", (const wchar_t *)var.bstrVal);
+                        if (var.vt == VT_BSTR) ob_set_a(o, L"description", (const wchar_t *)var.bstrVal);
                         VariantClear(&var);
                     }
                     
@@ -1575,7 +1608,7 @@ void capture_Devices(PA_PluginParameters params) {
                     hr = pPropBag->Read(L"DevicePath", &var, 0);
                     if (SUCCEEDED(hr))
                     {
-                        ob_set_a(o, L"devicePath", (const wchar_t *)var.bstrVal);
+                        if (var.vt == VT_BSTR) ob_set_a(o, L"devicePath", (const wchar_t *)var.bstrVal);
                         VariantClear(&var);
                     }
                     
@@ -1587,6 +1620,7 @@ void capture_Devices(PA_PluginParameters params) {
                     pMoniker->Release();
                 }
                 
+                pEnum->Release();
             }
             pDevEnum->Release();
         }
@@ -1765,7 +1799,7 @@ IBaseFilter *capture_getDeviceForName(const wchar_t *n, std::wstring &devicePath
 
 				if (deviceName.length() == 0) {
 					hr = pPropBag->Read(L"DevicePath", &var, 0);
-					if (SUCCEEDED(hr))
+					if ((SUCCEEDED(hr)) && (var.vt == VT_BSTR))
 					{
 						std::wstring _DevicePath = (const wchar_t *)var.bstrVal;
 						VariantClear(&var);
@@ -1777,7 +1811,7 @@ IBaseFilter *capture_getDeviceForName(const wchar_t *n, std::wstring &devicePath
 				}
 				else {
 					hr = pPropBag->Read(L"DevicePath", &var, 0);
-					if (SUCCEEDED(hr))
+					if ((SUCCEEDED(hr)) && (var.vt == VT_BSTR))
 					{
 						std::wstring _DevicePath = (const wchar_t *)var.bstrVal;
 						VariantClear(&var);
@@ -1792,15 +1826,42 @@ IBaseFilter *capture_getDeviceForName(const wchar_t *n, std::wstring &devicePath
 
 				}
 
+				VariantClear(&var);/* no-op if already cleared; frees a non-BSTR value */
+
 				pPropBag->Release();
 				pMoniker->Release();
 			}
 
+			pEnum->Release();
 		}
 		pDevEnum->Release();
 	}
 
 	return pBFilter;
+}
+
+/* GetConnectedMediaType allocates pbFormat (and may set pUnk); the caller must free both (FreeMediaType) */
+static bool capture_getVideoInfoHeader(ISampleGrabber *grabber, BITMAPINFOHEADER *header) {
+
+	bool returnValue = false;
+
+	AM_MEDIA_TYPE am_media_type;
+	ZeroMemory(&am_media_type, sizeof(am_media_type));
+
+	if ((grabber) && (SUCCEEDED(grabber->GetConnectedMediaType(&am_media_type)))) {
+
+		if ((am_media_type.formattype == FORMAT_VideoInfo)
+			&& (am_media_type.cbFormat >= sizeof(VIDEOINFOHEADER))
+			&& (am_media_type.pbFormat)) {
+			*header = ((VIDEOINFOHEADER *)am_media_type.pbFormat)->bmiHeader;
+			returnValue = (header->biWidth != 0) && (header->biHeight != 0);
+		}
+
+		if (am_media_type.cbFormat != 0) CoTaskMemFree((PVOID)am_media_type.pbFormat);
+		if (am_media_type.pUnk) am_media_type.pUnk->Release();
+	}
+
+	return returnValue;
 }
 
 PA_Picture CaptureMan::copyImage() {
@@ -1809,29 +1870,32 @@ PA_Picture CaptureMan::copyImage() {
 
 		if (!USE_VMR9) {
 
-			AM_MEDIA_TYPE am_media_type;
-			ZeroMemory(&am_media_type, sizeof(am_media_type));
+			BITMAPINFOHEADER bmiHeader;
+			long size = 0;
 
-			sampleGrabber->GetConnectedMediaType(&am_media_type);
-			VIDEOINFOHEADER *pVideoInfoHeader = (VIDEOINFOHEADER *)am_media_type.pbFormat;
+			/* GetCurrentBuffer(NULL) returns the required size; it fails until a sample has been buffered */
+			if ((capture_getVideoInfoHeader(sampleGrabber, &bmiHeader))
+				&& (SUCCEEDED(sampleGrabber->GetCurrentBuffer(&size, NULL)))
+				&& (size > 0)) {
 
-			long size = am_media_type.lSampleSize;
-			std::vector<uint8_t> buf(size);
+				std::vector<uint8_t> buf(size);
 
-			sampleGrabber->GetCurrentBuffer(&size, (long *)&buf[0]);
+				if (SUCCEEDED(sampleGrabber->GetCurrentBuffer(&size, (long *)&buf[0]))) {
 
-			BITMAPFILEHEADER bmphdr;
-			memset(&bmphdr, 0, sizeof(bmphdr));
-			bmphdr.bfType = ('M' << 8) | 'B';
-			bmphdr.bfSize = sizeof(bmphdr) + sizeof(BITMAPINFOHEADER) + size;
-			bmphdr.bfOffBits = sizeof(bmphdr) + sizeof(BITMAPINFOHEADER);
+					BITMAPFILEHEADER bmphdr;
+					memset(&bmphdr, 0, sizeof(bmphdr));
+					bmphdr.bfType = ('M' << 8) | 'B';
+					bmphdr.bfSize = sizeof(bmphdr) + sizeof(BITMAPINFOHEADER) + size;
+					bmphdr.bfOffBits = sizeof(bmphdr) + sizeof(BITMAPINFOHEADER);
 
-			std::vector<uint8_t> bytes(sizeof(bmphdr) + sizeof(BITMAPINFOHEADER) + size);
-			memmove((char *)&bytes[0], &bmphdr, sizeof(bmphdr));
-			memmove((char *)&bytes[sizeof(bmphdr)], &pVideoInfoHeader->bmiHeader, sizeof(BITMAPINFOHEADER));
-			memmove((char *)&bytes[sizeof(bmphdr) + sizeof(BITMAPINFOHEADER)], &buf[0], size);
+					std::vector<uint8_t> bytes(sizeof(bmphdr) + sizeof(BITMAPINFOHEADER) + size);
+					memmove((char *)&bytes[0], &bmphdr, sizeof(bmphdr));
+					memmove((char *)&bytes[sizeof(bmphdr)], &bmiHeader, sizeof(BITMAPINFOHEADER));
+					memmove((char *)&bytes[sizeof(bmphdr) + sizeof(BITMAPINFOHEADER)], &buf[0], size);
 
-			return PA_CreatePicture(&bytes[0], bytes.size());
+					return PA_CreatePicture(&bytes[0], (PA_long32)bytes.size());
+				}
+			}
 		}
 		else {
 
@@ -1859,7 +1923,9 @@ PA_Picture CaptureMan::copyImage() {
 						memmove((char *)&bytes[sizeof(bmphdr)], lpDib, sizeof(BITMAPINFOHEADER));
 						memmove((char *)&bytes[sizeof(bmphdr) + sizeof(BITMAPINFOHEADER)], p, size);
 
-						return PA_CreatePicture(&bytes[0], bytes.size());
+						PA_Picture picture = PA_CreatePicture(&bytes[0], (PA_long32)bytes.size());
+						CoTaskMemFree(lpDib);
+						return picture;
 					}
 
 				}
@@ -1901,44 +1967,45 @@ void CaptureMan::update(
 
 		if (!USE_VMR9) {
 
-			AM_MEDIA_TYPE am_media_type;
-			ZeroMemory(&am_media_type, sizeof(am_media_type));
+			BITMAPINFOHEADER bmiHeader;
 
-			sampleGrabber->GetConnectedMediaType(&am_media_type);
-			VIDEOINFOHEADER *pVideoInfoHeader = (VIDEOINFOHEADER *)am_media_type.pbFormat;
+			/* letterbox to the video aspect ratio; skip if the format is unknown (avoid dividing by zero) */
+			if (capture_getVideoInfoHeader(sampleGrabber, &bmiHeader)) {
 
-			double h = pVideoInfoHeader->bmiHeader.biHeight;
-			double w = pVideoInfoHeader->bmiHeader.biWidth;
-			double _width = width;
-			double _height = height;
+				double h = labs(bmiHeader.biHeight);
+				double w = labs(bmiHeader.biWidth);
+				double _width = width;
+				double _height = height;
 
-			if (w > h) {
+				if (w > h) {
 
-				long rationalHeight = (_width * (h / w));
-				if (height > rationalHeight) {
-					y += ((height - rationalHeight) / 2);
-					height = rationalHeight;
+					long rationalHeight = (_width * (h / w));
+					if (height > rationalHeight) {
+						y += ((height - rationalHeight) / 2);
+						height = rationalHeight;
+					}
+					else {
+						x += ((width - (_height * (w / h))) / 2);
+						width = (_height * (w / h));
+					}
+
 				}
+
 				else {
-					x += ((width - (_height * (w / h))) / 2);
-					width = (_height * (w / h));
-				}
 
-			}
-
-			else {
-
-				long rationalWidth = (_height * (w / h));
-				if (width > rationalWidth) {
-					x += ((width - rationalWidth) / 2);
-					width = rationalWidth;
+					long rationalWidth = (_height * (w / h));
+					if (width > rationalWidth) {
+						x += ((width - rationalWidth) / 2);
+						width = rationalWidth;
+					}
+					else {
+						y += ((height - (_width * (h / w))) / 2);
+						height = (_width * (h / w));
+					}
 				}
-				else {
-					y += ((height - (_width * (h / w))) / 2);
-					height = (_width * (h / w));
-				}
-			}
 			
+			}
+
 			videoWindow->SetWindowPosition(x, y, width, height);
 			if (hidden) {
 				videoWindow->put_Visible(OAFALSE);
@@ -1983,6 +2050,11 @@ void CaptureMan::setup(const wchar_t *deviceName,
 		IBaseFilter *pDeviceFilter = capture_getDeviceForName(deviceName, devicePath);
 
 		IGraphBuilder *pGraph = NULL;
+		IMediaControl *pMControl = NULL;
+		IVideoWindow *pVWindow = NULL;
+		IFileSinkFilter *pSink = NULL;
+		IBaseFilter *pFileOut = NULL;
+
 		HRESULT hr = CoCreateInstance(CLSID_FilterGraph, NULL,
 			CLSCTX_INPROC_SERVER,
 			IID_IGraphBuilder,
@@ -2061,7 +2133,6 @@ void CaptureMan::setup(const wchar_t *deviceName,
 
 					if (SUCCEEDED(hr)) {
 
-						IMediaControl *pMControl = NULL;
 						hr = pGraph->QueryInterface(IID_IMediaControl, (void **)&pMControl);
 
 						if (SUCCEEDED(hr)) {
@@ -2095,9 +2166,6 @@ void CaptureMan::setup(const wchar_t *deviceName,
 									}
 
 								}
-
-								IFileSinkFilter *pSink = NULL;
-								IBaseFilter *pFileOut = NULL;
 
 								if (file) {
 
@@ -2133,7 +2201,6 @@ void CaptureMan::setup(const wchar_t *deviceName,
 								}
 
 								if (SUCCEEDED(hr)) {
-									IVideoWindow *pVWindow = NULL;
 									hr = pGraph->QueryInterface(IID_IVideoWindow, (void **)&pVWindow);
 									if (SUCCEEDED(hr)) {
 
@@ -2143,41 +2210,41 @@ void CaptureMan::setup(const wchar_t *deviceName,
 
 											if (!USE_VMR9) {
 
-												AM_MEDIA_TYPE am_media_type;
-												ZeroMemory(&am_media_type, sizeof(am_media_type));
+												BITMAPINFOHEADER bmiHeader;
 
-												pGrabber->GetConnectedMediaType(&am_media_type);
-												VIDEOINFOHEADER *pVideoInfoHeader = (VIDEOINFOHEADER *)am_media_type.pbFormat;
+												/* letterbox to the video aspect ratio; skip if the format is unknown (avoid dividing by zero) */
+												if (capture_getVideoInfoHeader(pGrabber, &bmiHeader)) {
 
-												double h = pVideoInfoHeader->bmiHeader.biHeight;
-												double w = pVideoInfoHeader->bmiHeader.biWidth;
-												double _width = width;
-												double _height = height;
+													double h = labs(bmiHeader.biHeight);
+													double w = labs(bmiHeader.biWidth);
+													double _width = width;
+													double _height = height;
 
-												if (w > h) {
+													if (w > h) {
 
-													long rationalHeight = (_width * (h / w));
-													if (height > rationalHeight) {
-														y += ((height - rationalHeight) / 2);
-														height = rationalHeight;
+														long rationalHeight = (_width * (h / w));
+														if (height > rationalHeight) {
+															y += ((height - rationalHeight) / 2);
+															height = rationalHeight;
+														}
+														else {
+															x += ((width - (_height * (w / h))) / 2);
+															width = (_height * (w / h));
+														}
+
 													}
+
 													else {
-														x += ((width - (_height * (w / h))) / 2);
-														width = (_height * (w / h));
-													}
 
-												}
-
-												else {
-
-													long rationalWidth = (_height * (w / h));
-													if (width > rationalWidth) {
-														x += ((width - rationalWidth) / 2);
-														width = rationalWidth;
-													}
-													else {
-														y += ((height - (_width * (h / w))) / 2);
-														height = (_width * (h / w));
+														long rationalWidth = (_height * (w / h));
+														if (width > rationalWidth) {
+															x += ((width - rationalWidth) / 2);
+															width = rationalWidth;
+														}
+														else {
+															y += ((height - (_width * (h / w))) / 2);
+															height = (_width * (h / w));
+														}
 													}
 												}
 
@@ -2200,6 +2267,9 @@ void CaptureMan::setup(const wchar_t *deviceName,
 											windowlessControl9 = pVMR;
 											filterConfig9 = pConfig;
 											vmr9Filter = pVmr9;
+
+											sinkFilter = pSink;
+											fileFilter = pFileOut;
 
 											mediaControl->Pause();
 
@@ -2225,6 +2295,22 @@ void CaptureMan::setup(const wchar_t *deviceName,
 
 			}
 
+		}
+
+		if (!isConfigured) {
+			/* nothing was handed over to the members: release what was created, or the graph keeps the camera open */
+			if (pVWindow) pVWindow->Release();
+			if (pSink) pSink->Release();
+			if (pFileOut) pFileOut->Release();
+			if (pMControl) pMControl->Release();
+			if (pGrabber) pGrabber->Release();
+			if (pGrabberFilter) pGrabberFilter->Release();
+			if (pVMR) pVMR->Release();
+			if (pConfig) pConfig->Release();
+			if (pVmr9) pVmr9->Release();
+			if (pCapture) pCapture->Release();
+			if (pDeviceFilter) pDeviceFilter->Release();
+			if (pGraph) pGraph->Release();
 		}
 
 	}

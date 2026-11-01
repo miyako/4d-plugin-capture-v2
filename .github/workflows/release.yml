@@ -6,11 +6,11 @@
 # Trigger: push a tag matching v*.*.* (either by hand, or via bump-version.yml).
 # You can also run it manually against an existing tag with workflow_dispatch.
 #
-# PORTABILITY: Edit only PRODUCT_NAME below. Everything else is derived.
-# Canonical 4D layout is enforced:
-#   <Product>.4dbase/Plugins/<Product>.bundle/Contents/MacOS/<Product>
-#   <Product>.4dbase/Plugins/<Product>.bundle/Contents/Windows64/<Product>.4DX
-#   <Product>.4dbase/Plugins/<Product>.bundle/Contents/Resources/...
+# PORTABILITY: Edit only PRODUCT_NAME and FOURD_BASE below. Everything else is derived.
+# Canonical 4D layout is enforced (FOURD_BASE is the 4D project folder that holds Plugins):
+#   <FOURD_BASE>/Plugins/<Product>.bundle/Contents/MacOS/<Product>
+#   <FOURD_BASE>/Plugins/<Product>.bundle/Contents/Windows64/<Product>.4DX
+#   <FOURD_BASE>/Plugins/<Product>.bundle/Contents/Resources/...
 
 name: Build & Release
 
@@ -30,6 +30,8 @@ permissions:
 env:
   # ---- only this needs editing per-project ----
   PRODUCT_NAME: Capture
+  # 4D project folder that holds Plugins/ (Capture.vcxproj links into test\plugins\...)
+  FOURD_BASE: test
   MACOS_DEPLOYMENT_TARGET: '10.13'
   # ---------------------------------------------
 
@@ -67,10 +69,11 @@ jobs:
         shell: pwsh
         run: |
           $product = "${{ env.PRODUCT_NAME }}"
+          $base = "${{ env.FOURD_BASE }}"
           # Remove both canonical and legacy lower-case paths to avoid case-insensitive ghosts
-          Remove-Item -Recurse -Force -ErrorAction SilentlyContinue "$product.4dbase/Plugins/$product.bundle"
-          Remove-Item -Recurse -Force -ErrorAction SilentlyContinue "$product.4dbase/plugins"
-          Remove-Item -Recurse -Force -ErrorAction SilentlyContinue "$product.4dbase/Plugins/Default"
+          Remove-Item -Recurse -Force -ErrorAction SilentlyContinue "$base/Plugins/$product.bundle"
+          Remove-Item -Recurse -Force -ErrorAction SilentlyContinue "$base/plugins"
+          Remove-Item -Recurse -Force -ErrorAction SilentlyContinue "$base/Plugins/Default"
           Remove-Item -Recurse -Force -ErrorAction SilentlyContinue "Objs"
 
       # GitHub-hosted windows-latest ships VS2022 (v143 toolset) but not the
@@ -86,12 +89,13 @@ jobs:
         shell: pwsh
         run: |
           $product = "${{ env.PRODUCT_NAME }}"
-          $canonicalDir = "$product.4dbase/Plugins/$product.bundle/Contents/Windows64"
+          $base = "${{ env.FOURD_BASE }}"
+          $canonicalDir = "$base/Plugins/$product.bundle/Contents/Windows64"
           New-Item -ItemType Directory -Force -Path $canonicalDir | Out-Null
 
           # msbuild may have created plugins/contents/windows64 (lower-case) due to vcxproj settings.
           # Find the built .4DX wherever it landed, case-insensitive.
-          $found = Get-ChildItem -Recurse -Filter "$product.4DX" -ErrorAction SilentlyContinue | Where-Object { $_.FullName -like "*4dbase*" } | Select-Object -First 1
+          $found = Get-ChildItem -Recurse -Filter "$product.4DX" -ErrorAction SilentlyContinue | Where-Object { $_.FullName -like "$((Resolve-Path $base).Path)*" } | Select-Object -First 1
           if (-not $found) {
             Write-Host "Searching all..."
             Get-ChildItem -Recurse -Filter "*.4DX" | ForEach-Object { Write-Host $_.FullName }
@@ -116,7 +120,7 @@ jobs:
         with:
           name: windows-binaries
           # canonical case only - portable for macOS job
-          path: ${{ env.PRODUCT_NAME }}.4dbase/Plugins/${{ env.PRODUCT_NAME }}.bundle/Contents/Windows64/${{ env.PRODUCT_NAME }}.4DX
+          path: ${{ env.FOURD_BASE }}/Plugins/${{ env.PRODUCT_NAME }}.bundle/Contents/Windows64/${{ env.PRODUCT_NAME }}.4DX
           if-no-files-found: error
 
   build-macos:
@@ -173,7 +177,7 @@ jobs:
           PRODUCT="${{ env.PRODUCT_NAME }}"
           XCODE_PROJECT="${PRODUCT}.xcodeproj"
           XCODE_TARGET="${PRODUCT}"
-          FOURD_BASE="${PRODUCT}.4dbase"
+          FOURD_BASE="${{ env.FOURD_BASE }}"
           PLUGINS_DIR="${FOURD_BASE}/Plugins"
 
           echo "Cleaning stale outputs to avoid /Default/ vs / bug and case ghosts"
@@ -200,11 +204,11 @@ jobs:
         run: |
           set -euo pipefail
           PRODUCT="${{ env.PRODUCT_NAME }}"
-          BIN="${PRODUCT}.4dbase/Plugins/${PRODUCT}.bundle/Contents/MacOS/${PRODUCT}"
+          BIN="${{ env.FOURD_BASE }}/Plugins/${PRODUCT}.bundle/Contents/MacOS/${PRODUCT}"
           
           if [ ! -f "$BIN" ]; then
             echo "::error::Expected binary not found at $BIN - CONFIGURATION_BUILD_DIR mismatch?"
-            ls -R "${PRODUCT}.4dbase"
+            ls -R "${{ env.FOURD_BASE }}"
             exit 1
           fi
           
@@ -220,7 +224,7 @@ jobs:
         run: |
           set -euo pipefail
           PRODUCT="${{ env.PRODUCT_NAME }}"
-          BUNDLE="${PRODUCT}.4dbase/Plugins/${PRODUCT}.bundle"
+          BUNDLE="${{ env.FOURD_BASE }}/Plugins/${PRODUCT}.bundle"
           
           mkdir -p "$BUNDLE/Contents/Windows64"
           

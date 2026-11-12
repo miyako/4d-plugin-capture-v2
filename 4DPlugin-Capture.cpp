@@ -1552,6 +1552,7 @@ void capture_Devices(PA_PluginParameters params) {
             PA_SetObjectVariable(&v, o);
             
             PA_SetCollectionElement(devices, PA_GetCollectionLength(devices), v);
+            PA_ClearVariable(&v);
             
         }
         
@@ -1615,6 +1616,7 @@ void capture_Devices(PA_PluginParameters params) {
                     PA_Variable v = PA_CreateVariable(eVK_Object);
                     PA_SetObjectVariable(&v, o);
                     PA_SetCollectionElement(devices, PA_GetCollectionLength(devices), v);
+                    PA_ClearVariable(&v);
                     
                     pPropBag->Release();
                     pMoniker->Release();
